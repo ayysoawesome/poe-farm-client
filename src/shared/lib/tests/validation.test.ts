@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import { z, ZodError } from 'zod';
 import { parseSchema } from '../validation';
-import { createApiResponseSchema } from '../../model';
+import { createApiDataResponseSchema, createApiResponseSchema } from '../../model';
 
 describe('parseSchema', () => {
   it('returns the parsed schema output', () => {
@@ -30,5 +30,12 @@ describe('parseSchema', () => {
     const parsed = schema.parse({ data: [{ value: 'mirror' }] });
 
     expectTypeOf(parsed).toEqualTypeOf<{ data: { value: number }[] }>();
+  });
+
+  it('preserves single data response output type', () => {
+    const schema = createApiDataResponseSchema(z.object({ value: z.number() }));
+    const parsed = schema.parse({ data: { value: 175 } });
+
+    expectTypeOf(parsed).toEqualTypeOf<{ data: { value: number } }>();
   });
 });

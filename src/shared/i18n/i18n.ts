@@ -4,8 +4,8 @@ import { initReactI18next } from 'react-i18next';
 export const DEFAULT_LANGUAGE = 'en';
 
 export const supportedLanguages = [
-  { code: 'en', label: 'EN' },
-  { code: 'ru', label: 'RU' },
+  { code: 'en', flagCode: 'us', label: 'EN' },
+  { code: 'ru', flagCode: 'ru', label: 'RU' },
 ] as const;
 
 export type TLanguage = (typeof supportedLanguages)[number]['code'];
@@ -19,6 +19,18 @@ const resources = {
       language: {
         label: 'Language',
       },
+      market: {
+        noData: 'No data',
+        relative: {
+          hour_one: '{{count}} hour ago',
+          hour_other: '{{count}} hours ago',
+          minute_one: '{{count}} minute ago',
+          minute_other: '{{count}} minutes ago',
+          second_one: '{{count}} second ago',
+          second_other: '{{count}} seconds ago',
+        },
+        updated: 'Updated',
+      },
     },
   },
   ru: {
@@ -28,6 +40,24 @@ const resources = {
       },
       language: {
         label: 'Язык',
+      },
+      market: {
+        noData: 'Нет данных',
+        relative: {
+          hour_few: '{{count}} ч. назад',
+          hour_many: '{{count}} ч. назад',
+          hour_one: '{{count}} ч. назад',
+          hour_other: '{{count}} ч. назад',
+          minute_few: '{{count}} мин. назад',
+          minute_many: '{{count}} мин. назад',
+          minute_one: '{{count}} мин. назад',
+          minute_other: '{{count}} мин. назад',
+          second_few: '{{count}} сек. назад',
+          second_many: '{{count}} сек. назад',
+          second_one: '{{count}} сек. назад',
+          second_other: '{{count}} сек. назад',
+        },
+        updated: 'Обновлено',
       },
     },
   },

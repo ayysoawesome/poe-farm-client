@@ -1,2 +1,2 @@
-export { createApiResponseSchema } from './schemas';
+export { createApiDataResponseSchema, createApiResponseSchema } from './schemas';
 export type { TApiResponse } from './types';

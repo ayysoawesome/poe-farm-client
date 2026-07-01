@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { Outlet } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { MarketStatus } from '@/features/market-status';
 import { SelectLanguage } from '@/features/select-language';
 import { SelectLeague } from '@/features/select-league';
 
@@ -10,7 +11,7 @@ export const RootLayout: FC = () => {
   return (
     <div className='relative min-h-dvh overflow-x-hidden bg-page bg-[linear-gradient(180deg,rgb(255_232_179_/_24%),rgb(8_7_6_/_60%)_44%,#060504_100%),radial-gradient(circle_at_15%_10%,rgb(248_206_114_/_30%),transparent_28rem),radial-gradient(circle_at_82%_12%,rgb(159_199_255_/_18%),transparent_24rem),url("/bg.jpg")] bg-cover bg-fixed bg-center before:pointer-events-none before:fixed before:inset-0 before:z-0 before:bg-[linear-gradient(90deg,rgb(255_244_213_/_14%),transparent_24%,transparent_74%,rgb(255_244_213_/_12%)),rgb(255_236_190_/_8%)] before:backdrop-brightness-125 before:backdrop-saturate-[1.12] before:content-[""] after:pointer-events-none after:fixed after:inset-0 after:z-0 after:bg-[linear-gradient(rgb(255_255_255_/_3%)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255_/_3%)_1px,transparent_1px)] after:bg-[length:4rem_4rem] after:[mask-image:linear-gradient(to_bottom,rgb(0_0_0_/_85%),transparent_72%)] after:content-[""]'>
       <header className='relative z-20 border-b border-border bg-page/72 shadow-sm backdrop-blur-md'>
-        <div className='flex min-h-20 w-full justify-between items-center gap-3 px-4 sm:gap-4 sm:px-6 lg:px-8'>
+        <div className='flex min-h-20 w-full flex-wrap items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-6 lg:px-8'>
           <a
             className='flex min-w-0 items-center gap-3 text-inherit no-underline'
             href='/'
@@ -31,7 +32,8 @@ export const RootLayout: FC = () => {
             </span>
           </a>
 
-          <div className='flex w-full max-w-[22rem] items-center justify-end gap-2 sm:max-w-none'>
+          <div className='flex w-full flex-wrap items-center justify-end gap-2 lg:w-auto'>
+            <MarketStatus />
             <SelectLanguage />
             <SelectLeague />
           </div>

@@ -15,6 +15,13 @@ export const queryKeys = {
     history: (id: string, leagueId: string) =>
       [...queryKeys.bosses.all, 'history', id, leagueId] as const,
   },
+  market: {
+    all: ['market'] as const,
+    divineChaosRate: (leagueId: string) =>
+      [...queryKeys.market.all, 'divine-chaos-rate', leagueId] as const,
+    freshnessStatus: (leagueId: string) =>
+      [...queryKeys.market.all, 'freshness-status', leagueId] as const,
+  },
   conversations: {
     all: ['conversations'] as const,
     list: () => [...queryKeys.conversations.all, 'list'] as const,
