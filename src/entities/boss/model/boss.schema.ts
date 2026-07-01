@@ -1,4 +1,5 @@
 import { itemSchema } from '@/entities/item';
+import { createApiResponseSchema } from '@/shared/model';
 import { z } from 'zod';
 
 const moneySchema = z.object({
@@ -50,9 +51,8 @@ export const bossWithProfitSchema = bossSchema.extend({
   latestProfit: profitSnapshotSchema.nullable(),
 });
 
-export const bossListResponseSchema = z.object({
-  data: z.array(bossWithProfitSchema),
-});
+export const bossListResponseSchema =
+  createApiResponseSchema(bossWithProfitSchema);
 
 export const bossEntryComponentSchema = z.object({
   item: itemSchema,
@@ -82,6 +82,5 @@ export const bossDetailResponseSchema = z.object({
   data: bossDetailSchema,
 });
 
-export const profitHistoryResponseSchema = z.object({
-  data: z.array(profitResponseSchema),
-});
+export const profitHistoryResponseSchema =
+  createApiResponseSchema(profitResponseSchema);

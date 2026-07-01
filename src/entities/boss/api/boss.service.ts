@@ -1,8 +1,9 @@
 import { BaseService } from '@/shared/api';
+import { createApiResponseSchema } from '@/shared/model';
 import {
   bossDetailResponseSchema,
-  bossListResponseSchema,
-  profitHistoryResponseSchema,
+  bossWithProfitSchema,
+  profitResponseSchema,
 } from '../model/boss.schema';
 import type {
   TBossDetail,
@@ -11,6 +12,9 @@ import type {
 } from '../model/boss.type';
 
 const ENDPOINT = '/bosses';
+const bossListApiResponseSchema = createApiResponseSchema(bossWithProfitSchema);
+const profitHistoryApiResponseSchema =
+  createApiResponseSchema(profitResponseSchema);
 
 class BossService extends BaseService {
   constructor() {
@@ -19,7 +23,7 @@ class BossService extends BaseService {
 
   async getBosses(leagueId: string): Promise<TBossWithProfit[]> {
     const response = await this.get(undefined, { leagueId });
-    const result = bossListResponseSchema.parse(response);
+    const result = bossListApiResponseSchema.parse(response);
 
     return result.data;
   }
@@ -37,7 +41,7 @@ class BossService extends BaseService {
     const response = await this.apiClient<unknown>(`/profit/${id}/history`, {
       query: { leagueId },
     });
-    const result = profitHistoryResponseSchema.parse(response);
+    const result = profitHistoryApiResponseSchema.parse(response);
     return result.data;
   }
 }

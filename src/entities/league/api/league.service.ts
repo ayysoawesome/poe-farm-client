@@ -1,9 +1,10 @@
 import { BaseService } from '@/shared/api';
-import { z } from 'zod';
+import { createApiResponseSchema } from '@/shared/model';
 import { leagueSchema } from '../model/league.schemas';
 import type { TLeague } from '../model/league.types';
 
 const ENDPOINT = '/leagues';
+const leagueListResponseSchema = createApiResponseSchema(leagueSchema);
 
 class LeagueService extends BaseService {
   constructor() {
@@ -13,7 +14,7 @@ class LeagueService extends BaseService {
   async getLeagues(): Promise<TLeague[]> {
     const response = await this.get();
 
-    const parsed = z.object({ data: z.array(leagueSchema) }).parse(response);
+    const parsed = leagueListResponseSchema.parse(response);
 
     return parsed.data;
   }
