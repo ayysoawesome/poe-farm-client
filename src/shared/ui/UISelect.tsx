@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from 'react';
 import { cn } from '@/shared/lib/cn';
+import { ChevronDown } from 'lucide-react';
 
 export interface IUISelectOption {
   value: string;
@@ -75,7 +76,7 @@ export const UISelect = ({
           )}
           aria-hidden='true'
         >
-          ▾
+          <ChevronDown />
         </span>
       </button>
 
