@@ -7,7 +7,13 @@ interface ISortIconProps {
 
 export const SortIcon: FC<ISortIconProps> = ({ direction }) => {
   const Icon =
-    direction === 'asc' ? ArrowUp : direction === 'desc' ? ArrowDown : ArrowUpDown;
+    direction === 'asc'
+      ? ArrowUp
+      : direction === 'desc'
+        ? ArrowDown
+        : ArrowUpDown;
 
-  return <Icon aria-hidden='true' className='size-5 shrink-0' strokeWidth={2} />;
+  return (
+    <Icon aria-hidden='true' className='size-4 shrink-0' strokeWidth={2} />
+  );
 };

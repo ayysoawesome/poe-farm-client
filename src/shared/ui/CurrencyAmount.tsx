@@ -34,9 +34,7 @@ export const CurrencyAmount: FC<ICurrencyAmountProps> = ({
 }) => {
   const resolvedDivineValue =
     divineValue ??
-    (chaosValue !== null &&
-    chaosValue !== undefined &&
-    divineOrbChaosValue
+    (chaosValue !== null && chaosValue !== undefined && divineOrbChaosValue
       ? chaosValue / divineOrbChaosValue
       : undefined);
 

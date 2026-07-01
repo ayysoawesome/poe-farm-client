@@ -56,7 +56,7 @@ const columns = [
     cell: ({ row }) => (
       <CurrencyAmount
         chaosValue={row.original.price?.chaos}
-        className='w-full justify-end font-semibold text-value'
+        className='w-full justify-end font-semibold'
         divineValue={row.original.price?.divine}
         fallback='Unknown'
       />
@@ -65,7 +65,12 @@ const columns = [
 ];
 
 export const BossDropsTable: FC<IBossDropsTableProps> = ({ drops }) => {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: 'price',
+      desc: true,
+    },
+  ]);
   const table = useReactTable({
     columns,
     data: drops,
@@ -99,28 +104,26 @@ export const BossDropsTable: FC<IBossDropsTableProps> = ({ drops }) => {
                     ].join(' ')}
                     key={header.id}
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : (
-                          <button
-                            className={[
-                              'inline-flex w-full items-center gap-2 font-semibold uppercase text-faint transition hover:text-white',
-                              header.id === 'item'
-                                ? 'justify-start'
-                                : 'justify-end',
-                            ].join(' ')}
-                            onClick={header.column.getToggleSortingHandler()}
-                            type='button'
-                          >
-                            <span>
-                              {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                            </span>
-                            <SortIcon direction={header.column.getIsSorted()} />
-                          </button>
-                        )}
+                    {header.isPlaceholder ? null : (
+                      <button
+                        className={[
+                          'inline-flex w-full items-center gap-2 font-semibold uppercase text-faint transition hover:text-white',
+                          header.id === 'item'
+                            ? 'justify-start'
+                            : 'justify-end',
+                        ].join(' ')}
+                        onClick={header.column.getToggleSortingHandler()}
+                        type='button'
+                      >
+                        <span>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                        </span>
+                        <SortIcon direction={header.column.getIsSorted()} />
+                      </button>
+                    )}
                   </th>
                 ))}
               </tr>

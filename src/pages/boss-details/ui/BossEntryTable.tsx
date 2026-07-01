@@ -47,7 +47,7 @@ const columns = [
     header: 'Unit',
     cell: ({ row }) => (
       <CurrencyAmount
-        className='w-full justify-end font-semibold text-value'
+        className='w-full justify-end font-semibold'
         chaosValue={row.original.unitPrice?.chaos}
         divineValue={row.original.unitPrice?.divine}
         fallback='Unknown'
@@ -69,7 +69,12 @@ const columns = [
 ];
 
 export const BossEntryTable: FC<IBossEntryTableProps> = ({ components }) => {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: 'totalPrice',
+      desc: true,
+    },
+  ]);
   const table = useReactTable({
     columns,
     data: components,
@@ -89,7 +94,7 @@ export const BossEntryTable: FC<IBossEntryTableProps> = ({ components }) => {
         </h2>
       </div>
       <div className='overflow-x-auto'>
-        <table className='w-full min-w-[36rem] border-collapse text-base'>
+        <table className='w-full min-w-xl border-collapse text-base'>
           <thead className='border-b border-border text-left text-base uppercase text-faint'>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>

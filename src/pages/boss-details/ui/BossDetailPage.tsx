@@ -139,7 +139,7 @@ export const BossDetailPage: FC = () => {
         </div>
 
         <div className='grid gap-4 rounded-md border border-border bg-surface p-4 shadow-panel backdrop-blur-md sm:grid-cols-3 lg:grid-cols-1'>
-          <div className='grid gap-1 text-base'>
+          <div className='flex items-center justify-between text-base'>
             <span className='text-muted'>Entry cost</span>
             <span className='font-semibold text-white sm:text-right lg:text-left'>
               <CurrencyAmount
@@ -150,7 +150,7 @@ export const BossDetailPage: FC = () => {
               />
             </span>
           </div>
-          <div className='grid gap-1 text-base'>
+          <div className='flex items-center justify-between text-base'>
             <span className='text-muted'>Latest profit</span>
             <CurrencyAmount
               chaosValue={latest?.expectedProfit.chaos}
@@ -164,7 +164,7 @@ export const BossDetailPage: FC = () => {
               signed
             />
           </div>
-          <div className='grid gap-1 text-base'>
+          <div className='flex items-center justify-between text-base'>
             <span className='text-muted'>ROI</span>
             <span className='font-semibold text-white sm:text-right lg:text-left'>
               {latest ? `${Math.round(latest.roiPercent)}%` : 'No data'}

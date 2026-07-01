@@ -7,35 +7,22 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { Link } from '@tanstack/react-router';
-import type { ComponentProps, FC } from 'react';
+import type { FC } from 'react';
 import { useState } from 'react';
 import { type TBossWithProfit } from '@/entities/boss';
 import { CurrencyAmount, SortIcon } from '@/shared/ui';
+import { cn } from '@/shared/lib';
 
 interface IBossesTableProps {
   data: TBossWithProfit[];
 }
 
 const columnHelper = createColumnHelper<TBossWithProfit>();
-const tableCurrencyClassName = 'text-xl font-semibold';
-
-type TCurrencyAmountProps = ComponentProps<typeof CurrencyAmount>;
-
-const getCurrencyClassName = (
-  className: string,
-): TCurrencyAmountProps['className'] =>
-  `w-full justify-end ${tableCurrencyClassName} ${className}`;
 
 const formatPercent = (value: number | null | undefined) => {
   if (value === null || value === undefined) return 'No data';
 
   return `${Math.round(value)}%`;
-};
-
-const getProfitClassName = (profit: number | null | undefined) => {
-  if (profit === null || profit === undefined) return 'text-muted';
-
-  return profit >= 0 ? 'text-profit' : 'text-loss';
 };
 
 const columns = [
@@ -60,7 +47,7 @@ const columns = [
     cell: ({ row }) => (
       <CurrencyAmount
         chaosValue={row.original.latestProfit?.entryCostChaos}
-        className={getCurrencyClassName('text-muted')}
+        className='w-full justify-end'
         divineOrbChaosValue={row.original.latestProfit?.divineOrbChaosValue}
       />
     ),
@@ -71,7 +58,7 @@ const columns = [
     cell: ({ row }) => (
       <CurrencyAmount
         chaosValue={row.original.latestProfit?.expectedReturnChaos}
-        className={getCurrencyClassName('text-value')}
+        className='w-full justify-end'
         divineOrbChaosValue={row.original.latestProfit?.divineOrbChaosValue}
       />
     ),
@@ -85,7 +72,10 @@ const columns = [
       return (
         <CurrencyAmount
           chaosValue={profit}
-          className={getCurrencyClassName(getProfitClassName(profit))}
+          className={cn('w-full justify-end', {
+            'text-loss': profit ? profit < 0 : undefined,
+            'text-profit': profit ? profit > 0 : undefined,
+          })}
           divineOrbChaosValue={row.original.latestProfit?.divineOrbChaosValue}
           signed
         />
@@ -96,7 +86,12 @@ const columns = [
     id: 'roi',
     header: 'ROI',
     cell: ({ getValue }) => (
-      <span className='block text-right text-xl font-semibold text-white'>
+      <span
+        className={cn('block text-right text-xl font-semibold text-white', {
+          'text-loss': getValue() < 0,
+          'text-profit': getValue() > 0,
+        })}
+      >
         {formatPercent(getValue())}
       </span>
     ),
@@ -104,7 +99,13 @@ const columns = [
 ];
 
 export const BossesTable: FC<IBossesTableProps> = ({ data }) => {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: 'expectedProfit',
+      desc: true,
+    },
+  ]);
+
   const table = useReactTable({
     columns,
     data,
@@ -118,7 +119,7 @@ export const BossesTable: FC<IBossesTableProps> = ({ data }) => {
 
   return (
     <div className='w-full overflow-x-auto rounded-md border border-border bg-surface'>
-      <table className='w-full min-w-[46rem] border-collapse text-lg'>
+      <table className='w-full border-collapse text-lg'>
         <thead className='border-b border-border bg-surface-strong text-left text-base uppercase text-faint'>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
@@ -130,26 +131,24 @@ export const BossesTable: FC<IBossesTableProps> = ({ data }) => {
                   ].join(' ')}
                   key={header.id}
                 >
-                  {header.isPlaceholder
-                    ? null
-                    : (
-                        <button
-                          className={[
-                            'inline-flex w-full items-center gap-2 font-semibold uppercase text-faint transition hover:text-white',
-                            header.id === 'name' ? 'justify-start' : 'justify-end',
-                          ].join(' ')}
-                          onClick={header.column.getToggleSortingHandler()}
-                          type='button'
-                        >
-                          <span>
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                          </span>
-                          <SortIcon direction={header.column.getIsSorted()} />
-                        </button>
-                      )}
+                  {header.isPlaceholder ? null : (
+                    <button
+                      className={[
+                        'inline-flex w-full items-center gap-2 font-semibold uppercase text-faint transition hover:text-white',
+                        header.id === 'name' ? 'justify-start' : 'justify-end',
+                      ].join(' ')}
+                      onClick={header.column.getToggleSortingHandler()}
+                      type='button'
+                    >
+                      <span>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                      </span>
+                      <SortIcon direction={header.column.getIsSorted()} />
+                    </button>
+                  )}
                 </th>
               ))}
             </tr>
@@ -158,7 +157,7 @@ export const BossesTable: FC<IBossesTableProps> = ({ data }) => {
         <tbody>
           {table.getRowModel().rows.map((row) => (
             <tr
-              className='border-b border-white/[0.06] last:border-b-0 hover:bg-surface-soft'
+              className='border-b border-white/6 last:border-b-0 hover:bg-surface-soft'
               key={row.id}
             >
               {row.getVisibleCells().map((cell) => (
