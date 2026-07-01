@@ -5,6 +5,7 @@ import { BossesTable } from './BossesTabe';
 import { queryKeys } from '@/shared/api';
 import { bossService } from '@/entities/boss';
 import { useLeague } from '@/entities/league';
+import { UISkeleton } from '@/shared/ui';
 
 const BossesPageLayout: FC<{ children: ReactNode }> = ({ children }) => {
   return (
@@ -28,9 +29,7 @@ export const BossesPage: FC = () => {
   if (!leagueId || isLoading) {
     return (
       <BossesPageLayout>
-        <div className='rounded-md border border-border bg-surface px-5 py-4 text-lg text-muted'>
-          Loading bosses...
-        </div>
+        <UISkeleton className='block h-[28rem] w-full rounded-md border border-border bg-surface shadow-panel' />
       </BossesPageLayout>
     );
   }

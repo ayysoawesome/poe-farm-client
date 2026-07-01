@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   formatDivineChaosRate,
   formatFreshnessDate,
+  getMarketStatusDisplay,
   getLatestFreshnessTimestamp,
   type TRelativeTimeUnit,
 } from './marketStatus';
@@ -78,5 +79,25 @@ describe('marketStatus', () => {
         190_000,
       ),
     ).toBe('3 мин. назад');
+  });
+
+  it('returns loading display state for rate while loading', () => {
+    expect(
+      getMarketStatusDisplay({
+        isFreshnessLoading: false,
+        isRateLoading: true,
+        noDataText: 'No data',
+      }).rate,
+    ).toEqual({ kind: 'loading' });
+  });
+
+  it('returns loading display state for freshness while loading', () => {
+    expect(
+      getMarketStatusDisplay({
+        isFreshnessLoading: true,
+        isRateLoading: false,
+        noDataText: 'No data',
+      }).freshness,
+    ).toEqual({ kind: 'loading' });
   });
 });

@@ -5,11 +5,23 @@ import { marketService } from '@/entities/market';
 import { useLeague } from '@/entities/league';
 import { queryKeys } from '@/shared/api';
 import { CHAOS_ORB_ICON_URL, DIVINE_ORB_ICON_URL } from '@/shared/assets';
+import { UISkeleton } from '@/shared/ui';
 import {
-  formatDivineChaosRate,
-  formatFreshnessDate,
-  getLatestFreshnessTimestamp,
+  getMarketStatusDisplay,
+  type TMarketStatusDisplayValue,
 } from '../model/marketStatus';
+
+const MarketStatusValue: FC<{
+  className: string;
+  skeletonClassName: string;
+  value: TMarketStatusDisplayValue;
+}> = ({ className, skeletonClassName, value }) => {
+  if (value.kind === 'loading') {
+    return <UISkeleton className={skeletonClassName} />;
+  }
+
+  return <span className={className}>{value.value}</span>;
+};
 
 export const MarketStatus: FC = () => {
   const { selectedLeague } = useLeague();
@@ -32,20 +44,15 @@ export const MarketStatus: FC = () => {
     enabled: Boolean(leagueId),
   });
 
-  const latestTimestamp = freshnessQuery.data
-    ? getLatestFreshnessTimestamp(freshnessQuery.data)
-    : null;
-
-  const rateText = rateQuery.data
-    ? formatDivineChaosRate(rateQuery.data.chaosValue)
-    : rateQuery.isLoading
-      ? '...'
-      : t('market.noData');
-  const freshnessText = freshnessQuery.isLoading
-    ? '...'
-    : formatFreshnessDate(latestTimestamp, t('market.noData'), (unit, count) =>
-        t(`market.relative.${unit}`, { count }),
-      );
+  const display = getMarketStatusDisplay({
+    formatRelativeTime: (unit, count) =>
+      t(`market.relative.${unit}`, { count }),
+    isFreshnessLoading: freshnessQuery.isLoading,
+    isRateLoading: rateQuery.isLoading,
+    noDataText: t('market.noData'),
+    rateValue: rateQuery.data?.chaosValue,
+    status: freshnessQuery.data,
+  });
 
   return (
     <div className='flex min-w-0 flex-wrap items-center gap-2 text-sm text-muted'>
@@ -59,9 +66,11 @@ export const MarketStatus: FC = () => {
         />
         <span className='font-semibold text-white'>1</span>
         <span aria-hidden='true'>=</span>
-        <span className='text-lg font-bold leading-none text-gold-bright'>
-          {rateText}
-        </span>
+        <MarketStatusValue
+          className='text-lg font-bold leading-none text-gold-bright'
+          skeletonClassName='h-5 w-12'
+          value={display.rate}
+        />
         <img
           alt=''
           className='size-6'
@@ -73,7 +82,11 @@ export const MarketStatus: FC = () => {
 
       <div className='flex h-12 min-w-0 items-center gap-2 rounded border border-border bg-surface px-3'>
         <span className='text-faint'>{t('market.updated')}</span>
-        <span className='truncate font-semibold text-white'>{freshnessText}</span>
+        <MarketStatusValue
+          className='truncate font-semibold text-white'
+          skeletonClassName='h-4 w-24'
+          value={display.freshness}
+        />
       </div>
     </div>
   );

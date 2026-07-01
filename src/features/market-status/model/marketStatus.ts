@@ -6,6 +6,20 @@ export type TRelativeTimeFormatter = (
   count: number,
 ) => string;
 
+export type TMarketStatusDisplayValue =
+  | { kind: 'loading' }
+  | { kind: 'text'; value: string };
+
+interface IGetMarketStatusDisplayProps {
+  isFreshnessLoading: boolean;
+  isRateLoading: boolean;
+  noDataText: string;
+  rateValue?: number | null;
+  status?: TFreshnessStatus | null;
+  formatRelativeTime?: TRelativeTimeFormatter;
+  now?: number;
+}
+
 export const formatDivineChaosRate = (value: number): string => {
   return value.toLocaleString('en', {
     maximumFractionDigits: 1,
@@ -53,4 +67,40 @@ export const formatFreshnessDate = (
   const elapsedHours = Math.floor(elapsedMinutes / 60);
 
   return formatRelativeTime('hour', elapsedHours);
+};
+
+export const getMarketStatusDisplay = ({
+  isFreshnessLoading,
+  isRateLoading,
+  noDataText,
+  rateValue,
+  status,
+  formatRelativeTime,
+  now,
+}: IGetMarketStatusDisplayProps): {
+  freshness: TMarketStatusDisplayValue;
+  rate: TMarketStatusDisplayValue;
+} => {
+  return {
+    rate: isRateLoading
+      ? { kind: 'loading' }
+      : {
+          kind: 'text',
+          value:
+            rateValue !== null && rateValue !== undefined
+              ? formatDivineChaosRate(rateValue)
+              : noDataText,
+        },
+    freshness: isFreshnessLoading
+      ? { kind: 'loading' }
+      : {
+          kind: 'text',
+          value: formatFreshnessDate(
+            status ? getLatestFreshnessTimestamp(status) : null,
+            noDataText,
+            formatRelativeTime,
+            now,
+          ),
+        },
+  };
 };

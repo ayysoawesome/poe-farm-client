@@ -4,7 +4,7 @@ import type { FC } from 'react';
 import { bossService, type TProfitResponse } from '@/entities/boss';
 import { useLeague } from '@/entities/league';
 import { queryKeys } from '@/shared/api';
-import { CurrencyAmount } from '@/shared/ui';
+import { CurrencyAmount, UISkeleton } from '@/shared/ui';
 import { BossDropsTable } from './BossDropsTable';
 import { BossEntryTable } from './BossEntryTable';
 import { ProfitSnapshotsTable } from './ProfitSnapshotsTable';
@@ -88,8 +88,33 @@ export const BossDetailPage: FC = () => {
 
   if (!leagueId || detailQuery.isLoading) {
     return (
-      <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden px-4 py-8 text-lg text-muted sm:px-6 lg:px-8'>
-        Loading boss details...
+      <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden px-4 py-6 text-text sm:px-6 lg:px-8'>
+        <UISkeleton className='h-5 w-28' />
+
+        <div className='mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]'>
+          <div className='rounded-md border border-border bg-surface p-5 shadow-panel backdrop-blur-md'>
+            <div className='flex items-center gap-3'>
+              <UISkeleton className='size-15 shrink-0' />
+              <UISkeleton className='h-10 w-56' />
+            </div>
+            <UISkeleton className='mt-4 h-5 w-full max-w-3xl' />
+            <UISkeleton className='mt-3 h-5 w-2/3 max-w-2xl' />
+          </div>
+
+          <div className='grid gap-4 rounded-md border border-border bg-surface p-4 shadow-panel backdrop-blur-md sm:grid-cols-3 lg:grid-cols-1'>
+            {Array.from({ length: 3 }, (_, index) => (
+              <div className='flex items-center justify-between gap-4' key={index}>
+                <UISkeleton className='h-4 w-24' />
+                <UISkeleton className='h-6 w-20' />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className='mt-4 grid gap-4 lg:grid-cols-2'>
+          <UISkeleton className='block h-72 w-full rounded-md border border-border bg-surface shadow-panel' />
+          <UISkeleton className='block h-72 w-full rounded-md border border-border bg-surface shadow-panel' />
+        </div>
       </section>
     );
   }
@@ -188,8 +213,20 @@ export const BossDetailPage: FC = () => {
           </span>
         </div>
         {historyQuery.isLoading ? (
-          <div className='rounded border border-border bg-surface-soft px-4 py-8 text-base text-muted'>
-            Loading profit history...
+          <div className='rounded border border-border bg-black/20 p-4'>
+            <div className='flex h-36 items-end gap-2'>
+              {Array.from({ length: 8 }, (_, index) => (
+                <UISkeleton
+                  className='min-w-8 flex-1 rounded-t'
+                  key={index}
+                  style={{ height: `${28 + (index % 4) * 14}%` }}
+                />
+              ))}
+            </div>
+            <div className='mt-3 flex justify-between'>
+              <UISkeleton className='h-4 w-24' />
+              <UISkeleton className='h-4 w-24' />
+            </div>
           </div>
         ) : historyQuery.isError ? (
           <div className='rounded border border-border bg-surface-soft px-4 py-8 text-base text-loss'>
