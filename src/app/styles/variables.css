@@ -1,0 +1,20 @@
+@theme {
+    --color-page: #070604;
+    --color-surface: rgb(22 18 14 / 82%);
+    --color-surface-strong: rgb(12 10 8 / 91%);
+    --color-surface-soft: rgb(255 245 214 / 8%);
+    --color-border: rgb(238 195 119 / 20%);
+    --color-border-strong: rgb(238 195 119 / 34%);
+    --color-text: #f5ead8;
+    --color-muted: #b9ab95;
+    --color-faint: #817360;
+    --color-gold: #d7a84e;
+    --color-gold-bright: #f2c96d;
+    --color-profit: #7bd68b;
+    --color-loss: #ee746d;
+    --color-value: #7fb9ff;
+
+    --container-page: 90rem;
+
+    --shadow-panel: 0 24px 70px rgb(0 0 0 / 45%);
+}
