@@ -103,7 +103,10 @@ export const BossDetailPage: FC = () => {
 
           <div className='grid gap-4 rounded-md border border-border bg-surface p-4 shadow-panel backdrop-blur-md sm:grid-cols-3 lg:grid-cols-1'>
             {Array.from({ length: 3 }, (_, index) => (
-              <div className='flex items-center justify-between gap-4' key={index}>
+              <div
+                className='flex items-center justify-between gap-4'
+                key={index}
+              >
                 <UISkeleton className='h-4 w-24' />
                 <UISkeleton className='h-6 w-20' />
               </div>

@@ -87,7 +87,7 @@ export const BossEntryTable: FC<IBossEntryTableProps> = ({ components }) => {
   });
 
   return (
-    <section className='rounded-md border border-border bg-surface shadow-panel backdrop-blur-md'>
+    <section className='rounded-md border border-border bg-surface shadow-panel backdrop-blur-md h-fit'>
       <div className='border-b border-border bg-surface-strong px-4 py-3'>
         <h2 className='m-0 text-base font-semibold uppercase text-faint'>
           Entry

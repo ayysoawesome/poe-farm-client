@@ -8,7 +8,7 @@ interface IBossesNavigationProps {
 
 export const BossesNavigation: FC<IBossesNavigationProps> = ({ leagueId }) => {
   return (
-    <aside className='shrink-0 rounded-md border border-border bg-surface'>
+    <aside className='shrink-0 rounded-md border border-border bg-surface h-fit text-xl'>
       <nav
         className='flex min-w-56 flex-col py-2'
         aria-label='Economy sections'
