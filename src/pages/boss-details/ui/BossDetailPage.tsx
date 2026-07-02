@@ -133,7 +133,13 @@ export const BossDetailPage: FC = () => {
   }
 
   const detail = detailQuery.data;
-  const latest = historyQuery.data?.[0];
+  const detailHistory = detail.profit.history;
+  const fallbackHistory = historyQuery.data ?? [];
+  const profitHistory =
+    detailHistory.length > 0 ? detailHistory : fallbackHistory;
+  const isHistoryLoading = detailHistory.length === 0 && historyQuery.isLoading;
+  const isHistoryError = detailHistory.length === 0 && historyQuery.isError;
+  const latest = detail.profit.latest ?? fallbackHistory[0];
 
   return (
     <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden px-4 py-6 text-text sm:px-6 lg:px-8'>
@@ -209,10 +215,10 @@ export const BossDetailPage: FC = () => {
             Profit History
           </h2>
           <span className='text-base text-muted'>
-            {historyQuery.data?.length ?? 0} stored snapshots
+            {profitHistory.length} stored snapshots
           </span>
         </div>
-        {historyQuery.isLoading ? (
+        {isHistoryLoading ? (
           <div className='rounded border border-border bg-black/20 p-4'>
             <div className='flex h-36 items-end gap-2'>
               {Array.from({ length: 8 }, (_, index) => (
@@ -228,17 +234,17 @@ export const BossDetailPage: FC = () => {
               <UISkeleton className='h-4 w-24' />
             </div>
           </div>
-        ) : historyQuery.isError ? (
+        ) : isHistoryError ? (
           <div className='rounded border border-border bg-surface-soft px-4 py-8 text-base text-loss'>
             Failed to load profit history.
           </div>
         ) : (
-          <HistoryChart history={historyQuery.data ?? []} />
+          <HistoryChart history={profitHistory} />
         )}
       </section>
 
-      {historyQuery.data && historyQuery.data.length > 0 ? (
-        <ProfitSnapshotsTable snapshots={historyQuery.data} />
+      {profitHistory.length > 0 ? (
+        <ProfitSnapshotsTable snapshots={profitHistory} />
       ) : null}
     </section>
   );

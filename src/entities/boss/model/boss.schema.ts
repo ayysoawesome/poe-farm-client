@@ -75,6 +75,13 @@ export const bossDetailSchema = z.object({
     components: z.array(bossEntryComponentSchema),
     totalPrice: moneySchema.nullable(),
   }),
+  profit: z
+    .object({
+      latest: profitResponseSchema.nullable(),
+      history: z.array(profitResponseSchema),
+    })
+    .nullish()
+    .transform((profit) => profit ?? { latest: null, history: [] }),
   drops: z.array(bossDropSchema),
 });
 
