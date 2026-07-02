@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { TLeague } from '@/entities/league';
-import { getDefaultLeague, reconcileSelectedLeague } from './selectLeague';
+import {
+  buildLeaguePath,
+  getDefaultLeague,
+  getLeagueIdFromPathname,
+  reconcileSelectedLeague,
+} from './selectLeague';
 
 const league = (overrides: Partial<TLeague> & Pick<TLeague, 'id'>): TLeague => ({
   id: overrides.id,
@@ -32,5 +37,28 @@ describe('select league model', () => {
     ];
 
     expect(reconcileSelectedLeague(leagues, selected)).toEqual(leagues[1]);
+  });
+
+  it('reads the league id from league-scoped bosses routes', () => {
+    expect(getLeagueIdFromPathname('/mercenaries/bosses')).toBe('mercenaries');
+    expect(getLeagueIdFromPathname('/hardcore/bosses/maven')).toBe('hardcore');
+  });
+
+  it('does not treat legacy bosses routes as league-scoped', () => {
+    expect(getLeagueIdFromPathname('/bosses')).toBeNull();
+    expect(getLeagueIdFromPathname('/bosses/maven')).toBeNull();
+  });
+
+  it('replaces the league segment while keeping the current bosses path', () => {
+    expect(buildLeaguePath('/mercenaries/bosses/maven', 'hardcore')).toBe(
+      '/hardcore/bosses/maven',
+    );
+  });
+
+  it('adds the league segment to legacy bosses paths', () => {
+    expect(buildLeaguePath('/bosses/maven', 'mercenaries')).toBe(
+      '/mercenaries/bosses/maven',
+    );
+    expect(buildLeaguePath('/', 'mercenaries')).toBe('/mercenaries/bosses');
   });
 });

@@ -1,11 +1,19 @@
 import { createRouter } from '@tanstack/react-router';
 import { rootRoute } from './rootRoute';
-import { bossDetailRoute, bossesRoute, indexRoute } from './routes';
+import {
+  bossDetailRoute,
+  bossesRoute,
+  indexRoute,
+  legacyBossDetailRoute,
+  legacyBossesRoute,
+} from './routes';
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
   bossDetailRoute,
   bossesRoute,
+  legacyBossDetailRoute,
+  legacyBossesRoute,
 ]);
 
 export const router = createRouter({ routeTree });

@@ -1,20 +1,29 @@
 import { useEffect, useMemo, type FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { leagueService, useLeague, type TLeague } from '@/entities/league';
+import { useLocation, useNavigate } from '@tanstack/react-router';
+import { leagueService, type TLeague } from '@/entities/league';
 import { queryKeys } from '@/shared/api';
 import { UISelect } from '@/shared/ui';
-import { reconcileSelectedLeague } from '../model/selectLeague';
+import {
+  buildLeaguePath,
+  getLeagueIdFromPathname,
+  reconcileSelectedLeague,
+} from '../model/selectLeague';
 
 const EMPTY_LEAGUES: TLeague[] = [];
 
 export const SelectLeague: FC = () => {
-  const { selectedLeague, setSelectedLeague } = useLeague();
+  const location = useLocation();
+  const navigate = useNavigate();
   const leaguesQuery = useQuery({
     queryKey: queryKeys.leagues.all,
     queryFn: () => leagueService.getLeagues(),
   });
 
   const leagues = leaguesQuery.data ?? EMPTY_LEAGUES;
+  const selectedLeagueId = getLeagueIdFromPathname(location.pathname);
+  const selectedLeague =
+    leagues.find((league) => league.id === selectedLeagueId) ?? null;
   const options = useMemo(
     () =>
       leagues.map((league) => ({
@@ -28,23 +37,26 @@ export const SelectLeague: FC = () => {
     if (leagues.length === 0) return;
 
     const nextLeague = reconcileSelectedLeague(leagues, selectedLeague);
-    if (nextLeague && nextLeague.id !== selectedLeague?.id) {
-      setSelectedLeague(nextLeague);
+    if (nextLeague && nextLeague.id !== selectedLeagueId) {
+      navigate({
+        to: buildLeaguePath(location.pathname, nextLeague.id),
+        replace: true,
+      });
     }
-  }, [leagues, selectedLeague, setSelectedLeague]);
+  }, [leagues, location.pathname, navigate, selectedLeague, selectedLeagueId]);
 
   const handleValueChange = (leagueId: string) => {
-    const league = leagues.find((item) => item.id === leagueId);
-    if (league) {
-      setSelectedLeague(league);
-    }
+    navigate({
+      to: buildLeaguePath(location.pathname, leagueId),
+      replace: true,
+    });
   };
 
   return (
     <UISelect
       label='League'
       options={options}
-      value={selectedLeague?.id ?? null}
+      value={selectedLeagueId}
       onValueChange={handleValueChange}
       placeholder={
         leaguesQuery.isLoading

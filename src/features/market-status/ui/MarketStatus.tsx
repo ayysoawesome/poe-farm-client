@@ -1,11 +1,12 @@
 import type { FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { marketService } from '@/entities/market';
-import { useLeague } from '@/entities/league';
 import { queryKeys } from '@/shared/api';
 import { CHAOS_ORB_ICON_URL, DIVINE_ORB_ICON_URL } from '@/shared/assets';
 import { UISkeleton } from '@/shared/ui';
+import { getLeagueIdFromPathname } from '@/features/select-league/model/selectLeague';
 import {
   getMarketStatusDisplay,
   type TMarketStatusDisplayValue,
@@ -24,9 +25,9 @@ const MarketStatusValue: FC<{
 };
 
 export const MarketStatus: FC = () => {
-  const { selectedLeague } = useLeague();
+  const location = useLocation();
   const { t } = useTranslation();
-  const leagueId = selectedLeague?.id;
+  const leagueId = getLeagueIdFromPathname(location.pathname);
 
   const rateQuery = useQuery({
     queryKey: leagueId

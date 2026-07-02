@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link, useParams } from '@tanstack/react-router';
+import { Link, useLocation, useParams } from '@tanstack/react-router';
 import type { FC } from 'react';
 import { bossService, type TProfitResponse } from '@/entities/boss';
-import { useLeague } from '@/entities/league';
 import { queryKeys } from '@/shared/api';
 import { CurrencyAmount, UISkeleton } from '@/shared/ui';
+import { getLeagueIdFromPathname } from '@/features/select-league/model/selectLeague';
 import { BossDropsTable } from './BossDropsTable';
 import { BossEntryTable } from './BossEntryTable';
 import { ProfitSnapshotsTable } from './ProfitSnapshotsTable';
@@ -72,21 +72,21 @@ const HistoryChart: FC<{ history: TProfitResponse[] }> = ({ history }) => {
 };
 
 export const BossDetailPage: FC = () => {
-  const { bossId } = useParams({ from: '/bosses/$bossId' });
-  const { selectedLeague } = useLeague();
-  const leagueId = selectedLeague?.id;
+  const location = useLocation();
+  const { bossId } = useParams({ strict: false });
+  const leagueId = getLeagueIdFromPathname(location.pathname);
   const detailQuery = useQuery({
-    queryKey: queryKeys.bosses.detail(bossId, leagueId ?? ''),
-    queryFn: () => bossService.getBossById(bossId, leagueId!),
-    enabled: Boolean(leagueId),
+    queryKey: queryKeys.bosses.detail(bossId ?? '', leagueId ?? ''),
+    queryFn: () => bossService.getBossById(bossId!, leagueId!),
+    enabled: Boolean(leagueId && bossId),
   });
   const historyQuery = useQuery({
-    queryKey: queryKeys.bosses.history(bossId, leagueId ?? ''),
-    queryFn: () => bossService.getProfitHistory(bossId, leagueId!),
-    enabled: Boolean(leagueId),
+    queryKey: queryKeys.bosses.history(bossId ?? '', leagueId ?? ''),
+    queryFn: () => bossService.getProfitHistory(bossId!, leagueId!),
+    enabled: Boolean(leagueId && bossId),
   });
 
-  if (!leagueId || detailQuery.isLoading) {
+  if (!leagueId || !bossId || detailQuery.isLoading) {
     return (
       <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden px-4 py-6 text-text sm:px-6 lg:px-8'>
         <UISkeleton className='h-5 w-28' />
@@ -122,9 +122,19 @@ export const BossDetailPage: FC = () => {
   if (detailQuery.isError || !detailQuery.data) {
     return (
       <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden px-4 py-8 sm:px-6 lg:px-8'>
-        <Link className='text-base text-gold-bright hover:text-white' to='/'>
-          Back to bosses
-        </Link>
+        {leagueId ? (
+          <Link
+            className='text-base text-gold-bright hover:text-white'
+            params={{ leagueId }}
+            to='/$leagueId/bosses'
+          >
+            Back to bosses
+          </Link>
+        ) : (
+          <Link className='text-base text-gold-bright hover:text-white' to='/'>
+            Back to bosses
+          </Link>
+        )}
         <div className='mt-4 rounded border border-border bg-surface px-4 py-8 text-lg text-loss'>
           Failed to load boss details.
         </div>
@@ -143,12 +153,22 @@ export const BossDetailPage: FC = () => {
 
   return (
     <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden px-4 py-6 text-text sm:px-6 lg:px-8'>
-      <Link
-        className='text-base font-semibold text-gold-bright hover:text-white'
-        to='/bosses'
-      >
-        Back to bosses
-      </Link>
+      {leagueId ? (
+        <Link
+          className='text-base font-semibold text-gold-bright hover:text-white'
+          params={{ leagueId }}
+          to='/$leagueId/bosses'
+        >
+          Back to bosses
+        </Link>
+      ) : (
+        <Link
+          className='text-base font-semibold text-gold-bright hover:text-white'
+          to='/'
+        >
+          Back to bosses
+        </Link>
+      )}
 
       <div className='mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]'>
         <div className='rounded-md border border-border bg-surface p-5 shadow-panel backdrop-blur-md'>

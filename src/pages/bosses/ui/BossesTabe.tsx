@@ -8,13 +8,14 @@ import {
 } from '@tanstack/react-table';
 import { Link } from '@tanstack/react-router';
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { type TBossWithProfit } from '@/entities/boss';
 import { CurrencyAmount, SortIcon } from '@/shared/ui';
 import { cn } from '@/shared/lib';
 
 interface IBossesTableProps {
   data: TBossWithProfit[];
+  leagueId: string;
 }
 
 const columnHelper = createColumnHelper<TBossWithProfit>();
@@ -25,14 +26,14 @@ const formatPercent = (value: number | null | undefined) => {
   return `${Math.round(value)}%`;
 };
 
-const columns = [
+const getColumns = (leagueId: string) => [
   columnHelper.accessor('name', {
     header: 'Boss',
     cell: ({ row, getValue }) => (
       <Link
         className='text-xl font-semibold text-white transition hover:text-gold-bright flex gap-3 items-center'
-        params={{ bossId: row.original.id }}
-        to='/bosses/$bossId'
+        params={{ bossId: row.original.id, leagueId }}
+        to='/$leagueId/bosses/$bossId'
       >
         {row.original.iconUrl && (
           <img className='size-10' src={row.original.iconUrl} />
@@ -98,13 +99,14 @@ const columns = [
   }),
 ];
 
-export const BossesTable: FC<IBossesTableProps> = ({ data }) => {
+export const BossesTable: FC<IBossesTableProps> = ({ data, leagueId }) => {
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: 'expectedProfit',
       desc: true,
     },
   ]);
+  const columns = useMemo(() => getColumns(leagueId), [leagueId]);
 
   const table = useReactTable({
     columns,
