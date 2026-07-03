@@ -28,8 +28,15 @@ class BossService extends BaseService {
     return result.data;
   }
 
-  async getBossById(id: string, leagueId: string): Promise<TBossDetail> {
-    const response = await this.get(id, { leagueId });
+  async getBossById(
+    id: string,
+    leagueId: string,
+    variantId?: string | null,
+  ): Promise<TBossDetail> {
+    const response = await this.get(
+      id,
+      variantId ? { leagueId, variantId } : { leagueId },
+    );
     const result = bossDetailResponseSchema.parse(response);
     return result.data;
   }

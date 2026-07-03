@@ -46,7 +46,11 @@ export const CurrencyAmount: FC<ICurrencyAmountProps> = ({
     resolvedDivineValue === undefined ||
     Number.isNaN(resolvedDivineValue)
   ) {
-    return <span className='text-muted'>{fallback ?? t('common.noData')}</span>;
+    return (
+      <span className={cn('inline-flex text-muted', className)}>
+        {fallback ?? t('common.noData')}
+      </span>
+    );
   }
 
   const canUseChaos = chaosValue !== null && chaosValue !== undefined;

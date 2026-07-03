@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useLocation, useParams } from '@tanstack/react-router';
 import type { FC } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { bossService } from '@/entities/boss';
+import { bossService, type TBossDetail } from '@/entities/boss';
 import { queryKeys } from '@/shared/api';
-import { CurrencyAmount, UISkeleton } from '@/shared/ui';
+import { CurrencyAmount, UISelect, UISkeleton } from '@/shared/ui';
 import { getLeagueIdFromPathname } from '@/features/select-league/model/selectLeague';
 import { BossDropsTable } from './BossDropsTable';
 import { BossEntryTable } from './BossEntryTable';
@@ -19,21 +20,56 @@ const getProfitTone = (profit: number) =>
 const backIconLinkClassName =
   'inline-flex size-10 shrink-0 items-center justify-center rounded-md border border-border bg-surface-soft text-gold-bright transition hover:border-border-strong hover:bg-surface-soft/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-bright';
 
+type TVariantId = TBossDetail['selectedVariantId'];
+
+const variantIds: TVariantId[] = ['default', 'low', 'mid', 'high'];
+
+const getVariantIdFromSearch = (): TVariantId | null => {
+  if (typeof window === 'undefined') return null;
+
+  const variantId = new URLSearchParams(window.location.search).get(
+    'variantId',
+  );
+
+  return variantIds.includes(variantId as TVariantId)
+    ? (variantId as TVariantId)
+    : null;
+};
+
+const updateVariantIdSearch = (variantId: TVariantId) => {
+  const url = new URL(window.location.href);
+  url.searchParams.set('variantId', variantId);
+  window.history.replaceState(window.history.state, '', url);
+};
+
 export const BossDetailPage: FC = () => {
   const location = useLocation();
   const { t } = useTranslation();
   const { bossId } = useParams({ strict: false });
   const leagueId = getLeagueIdFromPathname(location.pathname);
+  const [requestedVariantId, setRequestedVariantId] = useState<TVariantId | null>(
+    getVariantIdFromSearch,
+  );
   const detailQuery = useQuery({
-    queryKey: queryKeys.bosses.detail(bossId ?? '', leagueId ?? ''),
-    queryFn: () => bossService.getBossById(bossId!, leagueId!),
+    queryKey: queryKeys.bosses.detail(
+      bossId ?? '',
+      leagueId ?? '',
+      requestedVariantId,
+    ),
+    queryFn: () => bossService.getBossById(bossId!, leagueId!, requestedVariantId),
     enabled: Boolean(leagueId && bossId),
   });
-  const historyQuery = useQuery({
-    queryKey: queryKeys.bosses.history(bossId ?? '', leagueId ?? ''),
-    queryFn: () => bossService.getProfitHistory(bossId!, leagueId!),
-    enabled: Boolean(leagueId && bossId),
-  });
+  const variantOptions = useMemo(
+    () => {
+      const variants = detailQuery.data?.variants ?? [];
+
+      return variants.map((variant) => ({
+        value: variant.id,
+        label: variant.label,
+      }));
+    },
+    [detailQuery.data?.variants],
+  );
 
   if (!leagueId || !bossId || detailQuery.isLoading) {
     return (
@@ -98,13 +134,15 @@ export const BossDetailPage: FC = () => {
   }
 
   const detail = detailQuery.data;
-  const detailHistory = detail.profit.history;
-  const fallbackHistory = historyQuery.data ?? [];
-  const profitHistory =
-    detailHistory.length > 0 ? detailHistory : fallbackHistory;
-  const isHistoryLoading = detailHistory.length === 0 && historyQuery.isLoading;
-  const isHistoryError = detailHistory.length === 0 && historyQuery.isError;
-  const latest = detail.profit.latest ?? fallbackHistory[0];
+  const profitHistory = detail.profit.history;
+  const latest = detail.profit.latest ?? profitHistory[0];
+
+  const handleVariantChange = (value: string) => {
+    const variantId = value as TVariantId;
+
+    setRequestedVariantId(variantId);
+    updateVariantIdSearch(variantId);
+  };
 
   return (
     <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden text-text'>
@@ -148,6 +186,18 @@ export const BossDetailPage: FC = () => {
         </div>
 
         <div className='grid gap-4 rounded-md border border-border bg-surface p-4 shadow-panel backdrop-blur-md sm:grid-cols-3 lg:grid-cols-1'>
+          {variantOptions.length > 1 ? (
+            <div className='sm:col-span-3 lg:col-span-1'>
+              <UISelect
+                buttonClassName='min-h-10'
+                className='min-w-0'
+                label='Boss variant'
+                onValueChange={handleVariantChange}
+                options={variantOptions}
+                value={detail.selectedVariantId}
+              />
+            </div>
+          ) : null}
           <div className='flex items-center justify-between text-base'>
             <span className='text-muted'>{t('bossDetail.cost')}</span>
             <span className='font-semibold text-white sm:text-right lg:text-left'>
@@ -195,7 +245,11 @@ export const BossDetailPage: FC = () => {
 
       <div className='mt-4 grid gap-4 lg:grid-cols-2'>
         <BossEntryTable components={detail.entry.components} />
-        <BossDropsTable drops={detail.drops} />
+        <BossDropsTable
+          dropGroups={detail.dropGroups}
+          drops={detail.drops}
+          selectedVariantId={detail.selectedVariantId}
+        />
       </div>
 
       <section className='mt-4 rounded-md border border-border bg-surface p-4 shadow-panel backdrop-blur-md'>
@@ -209,29 +263,7 @@ export const BossDetailPage: FC = () => {
             })}
           </span>
         </div>
-        {isHistoryLoading ? (
-          <div className='rounded border border-border bg-black/20 p-4'>
-            <div className='flex h-36 items-end gap-2'>
-              {Array.from({ length: 8 }, (_, index) => (
-                <UISkeleton
-                  className='min-w-8 flex-1 rounded-t'
-                  key={index}
-                  style={{ height: `${28 + (index % 4) * 14}%` }}
-                />
-              ))}
-            </div>
-            <div className='mt-3 flex justify-between'>
-              <UISkeleton className='h-4 w-24' />
-              <UISkeleton className='h-4 w-24' />
-            </div>
-          </div>
-        ) : isHistoryError ? (
-          <div className='rounded border border-border bg-surface-soft px-4 py-8 text-base text-loss'>
-            {t('bossDetail.errors.history')}
-          </div>
-        ) : (
-          <ProfitHistoryChart history={profitHistory} />
-        )}
+        <ProfitHistoryChart history={profitHistory} />
       </section>
 
       {profitHistory.length > 0 ? (

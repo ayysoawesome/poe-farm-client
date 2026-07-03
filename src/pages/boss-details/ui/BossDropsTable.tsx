@@ -1,21 +1,27 @@
-import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  type SortingState,
-  useReactTable,
-} from '@tanstack/react-table';
 import type { FC } from 'react';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TBossDetail } from '@/entities/boss';
-import { CurrencyAmount, SortIcon } from '@/shared/ui';
+import { CurrencyAmount } from '@/shared/ui';
 
 type TDrop = TBossDetail['drops'][number];
+type TDropGroup = TBossDetail['dropGroups'][number];
+type TVariantId = TBossDetail['selectedVariantId'];
+
+type TDropRow = {
+  id: string;
+  item: TDrop['item'];
+  dropRate: number | null;
+  price: TDrop['price'];
+  quantity?: number;
+  quantityRowSpan?: number;
+  skipQuantityCell?: boolean;
+};
 
 interface IBossDropsTableProps {
   drops: TDrop[];
+  dropGroups: TDropGroup[];
+  selectedVariantId: TVariantId;
 }
 
 const formatPercent = (value: number | null, unknownText: string) => {
@@ -24,130 +30,138 @@ const formatPercent = (value: number | null, unknownText: string) => {
   return `${(value * 100).toFixed(value < 0.01 ? 2 : 1)}%`;
 };
 
-const columnHelper = createColumnHelper<TDrop>();
+const getGroupQuantity = (
+  group: TDropGroup,
+  selectedVariantId: TVariantId,
+) => {
+  if (group.selectedQuantity !== undefined) return group.selectedQuantity;
+  if (selectedVariantId === 'default') return 1;
 
-const getColumns = (t: ReturnType<typeof useTranslation>['t']) => [
-  columnHelper.accessor((row) => row.item.name, {
-    id: 'item',
-    header: t('common.item'),
-    cell: ({ getValue, row }) => (
-      <div className='flex items-center gap-2'>
-        {row.original.item.iconUrl && (
-          <img
-            src={row.original.item.iconUrl}
-            alt={row.original.item.name}
-            className='size-7 shrink-0'
-          />
-        )}
-        <span className='font-semibold text-white'>{getValue()}</span>
-      </div>
-    ),
-  }),
-  columnHelper.accessor('dropRate', {
-    header: t('common.chance'),
-    cell: ({ getValue }) => (
-      <span className='block text-right text-muted'>
-        {formatPercent(getValue(), t('common.unknown'))}
-      </span>
-    ),
-  }),
-  columnHelper.accessor((row) => row.price?.chaos ?? 0, {
-    id: 'price',
-    header: t('common.price'),
-    cell: ({ row }) => (
-      <CurrencyAmount
-        chaosValue={row.original.price?.chaos}
-        className='w-full justify-end font-semibold'
-        divineValue={row.original.price?.divine}
-        fallback={t('common.unknown')}
-      />
-    ),
-  }),
-];
+  return group.quantityByBucket?.[selectedVariantId] ?? 1;
+};
 
-export const BossDropsTable: FC<IBossDropsTableProps> = ({ drops }) => {
-  const { t } = useTranslation();
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      id: 'price',
-      desc: true,
-    },
-  ]);
-  const columns = useMemo(() => getColumns(t), [t]);
-  const table = useReactTable({
-    columns,
-    data: drops,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
-    state: {
-      sorting,
-    },
+const getDropRows = (
+  drops: TDrop[],
+  dropGroups: TDropGroup[],
+  selectedVariantId: TVariantId,
+): TDropRow[] => {
+  const groupedItemIds = new Set(
+    dropGroups.flatMap((group) => group.items.map((item) => item.item.id)),
+  );
+
+  const dropRows: TDropRow[] = drops
+    .filter((drop) => !groupedItemIds.has(drop.item.id))
+    .map((drop) => ({
+      id: drop.item.id,
+      item: drop.item,
+      dropRate: drop.dropRate,
+      price: drop.price,
+    }));
+
+  const groupRows = dropGroups.flatMap((group) => {
+    const quantity = getGroupQuantity(group, selectedVariantId);
+
+    return group.items.map<TDropRow>((drop, index) => ({
+      id: `${group.id}-${drop.item.id}`,
+      item: drop.item,
+      dropRate: drop.dropRate,
+      price: drop.price,
+      quantity: index === 0 ? quantity : undefined,
+      quantityRowSpan: index === 0 ? group.items.length : undefined,
+      skipQuantityCell: index > 0,
+    }));
   });
 
+  return [...dropRows, ...groupRows];
+};
+
+export const BossDropsTable: FC<IBossDropsTableProps> = ({
+  dropGroups,
+  drops,
+  selectedVariantId,
+}) => {
+  const { t } = useTranslation();
+  const rows = useMemo(
+    () => getDropRows(drops, dropGroups, selectedVariantId),
+    [dropGroups, drops, selectedVariantId],
+  );
+  const showQuantity = rows.some((row) => row.quantity && row.quantity !== 1);
+
+  const renderHeader = (label: string, align: 'left' | 'right' = 'left') => (
+    <th
+      className={[
+        'px-3 py-3 font-semibold uppercase text-faint',
+        align === 'right' ? 'text-right' : 'text-left',
+      ].join(' ')}
+    >
+      {label}
+    </th>
+  );
+
   return (
-    <section className='rounded-md border border-border bg-surface shadow-panel backdrop-blur-md h-fit'>
+    <section className='h-fit rounded-md border border-border bg-surface shadow-panel backdrop-blur-md'>
       <div className='border-b border-border bg-surface-strong px-4 py-3'>
         <h2 className='m-0 text-base font-semibold uppercase text-faint'>
           {t('bossDetail.drops')}
         </h2>
       </div>
-      <div className='overflow-x-auto'>
-        <table className='w-full min-w-[40rem] border-collapse text-base'>
-          <thead className='border-b border-border text-left text-base uppercase text-faint'>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    className={[
-                      'px-4 py-3',
-                      header.id === 'dropRate' || header.id === 'price'
-                        ? 'text-right'
-                        : '',
-                    ].join(' ')}
-                    key={header.id}
-                  >
-                    {header.isPlaceholder ? null : (
-                      <button
-                        className={[
-                          'inline-flex w-full items-center gap-2 font-semibold uppercase text-faint transition hover:text-white',
-                          header.id === 'item'
-                            ? 'justify-start'
-                            : 'justify-end',
-                        ].join(' ')}
-                        onClick={header.column.getToggleSortingHandler()}
-                        type='button'
-                      >
-                        <span>
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                        </span>
-                        <SortIcon direction={header.column.getIsSorted()} />
-                      </button>
-                    )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr
-                className='border-b border-white/[0.06] last:border-b-0'
-                key={row.id}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td className='px-4 py-3' key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <table className='w-full table-fixed border-collapse text-sm sm:text-base'>
+        <thead className='border-b border-border text-left text-sm uppercase text-faint sm:text-base'>
+          <tr>
+            {renderHeader(t('common.item'))}
+            {showQuantity ? renderHeader(t('common.quantity'), 'right') : null}
+            {renderHeader(t('common.chance'), 'right')}
+            {renderHeader(t('common.price'), 'right')}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr
+              className='border-b border-white/[0.06] last:border-b-0'
+              key={row.id}
+            >
+              <td className='min-w-0 px-3 py-3 align-middle'>
+                <div className='flex min-w-0 items-center gap-2'>
+                  {row.item.iconUrl && (
+                    <img
+                      src={row.item.iconUrl}
+                      alt={row.item.name}
+                      className='size-6 shrink-0 sm:size-7'
+                    />
+                  )}
+                  <span className='min-w-0 truncate font-semibold text-white'>
+                    {row.item.name}
+                  </span>
+                </div>
+              </td>
+              {showQuantity && row.quantityRowSpan ? (
+                <td
+                  className='w-16 px-3 py-3 text-right align-middle font-semibold text-white'
+                  rowSpan={row.quantityRowSpan}
+                >
+                  {row.quantity}
+                </td>
+              ) : showQuantity && !row.skipQuantityCell ? (
+                <td className='w-16 px-3 py-3 text-right align-middle text-muted'>
+                  1
+                </td>
+              ) : null}
+              <td className='w-20 px-3 py-3 text-right align-middle text-muted'>
+                {formatPercent(row.dropRate, t('common.unknown'))}
+              </td>
+              <td className='w-24 px-3 py-3 align-middle'>
+                <CurrencyAmount
+                  chaosValue={row.price?.chaos}
+                  className='w-full justify-end font-semibold'
+                  divineValue={row.price?.divine}
+                  fallback={t('common.unknown')}
+                  iconClassName='size-5 sm:size-6'
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </section>
   );
 };

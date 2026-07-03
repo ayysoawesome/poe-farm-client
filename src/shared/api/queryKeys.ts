@@ -10,8 +10,8 @@ export const queryKeys = {
   bosses: {
     all: ['bosses'] as const,
     list: (leagueId: string) => [...queryKeys.bosses.all, 'list', leagueId] as const,
-    detail: (id: string, leagueId: string) =>
-      [...queryKeys.bosses.all, 'detail', id, leagueId] as const,
+    detail: (id: string, leagueId: string, variantId?: string | null) =>
+      [...queryKeys.bosses.all, 'detail', id, leagueId, variantId ?? null] as const,
     history: (id: string, leagueId: string) =>
       [...queryKeys.bosses.all, 'history', id, leagueId] as const,
   },

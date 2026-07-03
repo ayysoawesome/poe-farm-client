@@ -15,6 +15,7 @@ const createSnapshot = (
   id,
   bossId: 'boss-1',
   leagueId: 'league-1',
+  quantityBucket: 'default',
   entryCost: { chaos: entryCost * 100, divine: entryCost },
   expectedReturn: { chaos: expectedReturn * 100, divine: expectedReturn },
   expectedProfit: { chaos: expectedProfit * 100, divine: expectedProfit },

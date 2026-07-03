@@ -7,10 +7,20 @@ const moneySchema = z.object({
   divine: z.number(),
 });
 
+const quantityBucketSchema = z.enum(['default', 'low', 'mid', 'high']);
+
+export const bossVariantSchema = z.object({
+  id: quantityBucketSchema,
+  label: z.string(),
+  kind: z.enum(['default', 'quantity']),
+  isDefault: z.boolean(),
+});
+
 export const profitSnapshotSchema = z.object({
   id: z.string(),
   bossId: z.string(),
   leagueId: z.string(),
+  quantityBucket: quantityBucketSchema,
   syncRunId: z.string(),
   entryCostChaos: z.number(),
   expectedReturnChaos: z.number(),
@@ -27,6 +37,7 @@ export const profitResponseSchema = z.object({
   id: z.string(),
   bossId: z.string(),
   leagueId: z.string(),
+  quantityBucket: quantityBucketSchema,
   entryCost: moneySchema,
   expectedReturn: moneySchema,
   expectedProfit: moneySchema,
@@ -34,6 +45,10 @@ export const profitResponseSchema = z.object({
   isComplete: z.boolean(),
   unknownDropCount: z.number().int().nonnegative(),
   calculatedAt: z.number().int(),
+});
+
+export const profitQuantityBucketSchema = profitResponseSchema.extend({
+  quantityBucket: quantityBucketSchema,
 });
 
 export const bossSchema = z.object({
@@ -49,6 +64,13 @@ export const bossSchema = z.object({
 
 export const bossWithProfitSchema = bossSchema.extend({
   latestProfit: profitSnapshotSchema.nullable(),
+  profitRange: z
+    .object({
+      min: profitResponseSchema.nullable(),
+      max: profitResponseSchema.nullable(),
+    })
+    .optional(),
+  variants: z.array(bossVariantSchema).optional().default([]),
 });
 
 export const bossListResponseSchema =
@@ -69,8 +91,31 @@ export const bossDropSchema = z.object({
   price: moneySchema.nullable(),
 });
 
+export const bossDropGroupSchema = z.object({
+  id: z.string(),
+  type: z.enum(['quantity_scaled_fragments']),
+  label: z.string(),
+  selectedQuantity: z.number().optional(),
+  quantityByBucket: z
+    .object({
+      low: z.number(),
+      mid: z.number(),
+      high: z.number(),
+    })
+    .optional(),
+  items: z.array(
+    z.object({
+      item: itemSchema,
+      dropRate: z.number().nullable(),
+      price: moneySchema.nullable(),
+    }),
+  ),
+});
+
 export const bossDetailSchema = z.object({
   boss: bossSchema,
+  variants: z.array(bossVariantSchema).optional().default([]),
+  selectedVariantId: quantityBucketSchema.optional().default('default'),
   entry: z.object({
     components: z.array(bossEntryComponentSchema),
     totalPrice: moneySchema.nullable(),
@@ -79,10 +124,27 @@ export const bossDetailSchema = z.object({
     .object({
       latest: profitResponseSchema.nullable(),
       history: z.array(profitResponseSchema),
+      quantityBuckets: z.array(profitQuantityBucketSchema).optional().default([]),
+      range: z
+        .object({
+          min: profitResponseSchema.nullable(),
+          max: profitResponseSchema.nullable(),
+        })
+        .optional()
+        .default({ min: null, max: null }),
     })
     .nullish()
-    .transform((profit) => profit ?? { latest: null, history: [] }),
+    .transform(
+      (profit) =>
+        profit ?? {
+          latest: null,
+          history: [],
+          quantityBuckets: [],
+          range: { min: null, max: null },
+        },
+    ),
   drops: z.array(bossDropSchema),
+  dropGroups: z.array(bossDropGroupSchema).optional().default([]),
 });
 
 export const bossDetailResponseSchema = z.object({
