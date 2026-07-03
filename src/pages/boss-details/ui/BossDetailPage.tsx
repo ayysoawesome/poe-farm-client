@@ -37,10 +37,8 @@ export const BossDetailPage: FC = () => {
 
   if (!leagueId || !bossId || detailQuery.isLoading) {
     return (
-      <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden px-4 py-6 text-text sm:px-6 lg:px-8'>
-        <UISkeleton className='h-5 w-28' />
-
-        <div className='mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]'>
+      <section className='mx-auto box-border max-w-page overflow-x-hidden text-text'>
+        <div className='grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]'>
           <div className='rounded-md border border-border bg-surface p-5 shadow-panel backdrop-blur-md'>
             <div className='flex items-center gap-3'>
               <UISkeleton className='size-15 shrink-0' />
