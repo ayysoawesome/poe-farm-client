@@ -1,75 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useLocation, useParams } from '@tanstack/react-router';
 import type { FC } from 'react';
-import { bossService, type TProfitResponse } from '@/entities/boss';
+import { bossService } from '@/entities/boss';
 import { queryKeys } from '@/shared/api';
 import { CurrencyAmount, UISkeleton } from '@/shared/ui';
 import { getLeagueIdFromPathname } from '@/features/select-league/model/selectLeague';
 import { BossDropsTable } from './BossDropsTable';
 import { BossEntryTable } from './BossEntryTable';
+import { ProfitHistoryChart } from './ProfitHistoryChart';
 import { ProfitSnapshotsTable } from './ProfitSnapshotsTable';
-
-const formatDate = (timestamp: number) =>
-  new Intl.DateTimeFormat('en', {
-    month: 'short',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(timestamp);
+import { ArrowLeft } from 'lucide-react';
+import { cn } from '@/shared/lib';
 
 const getProfitTone = (profit: number) =>
   profit >= 0 ? 'text-profit' : 'text-loss';
 
-const HistoryChart: FC<{ history: TProfitResponse[] }> = ({ history }) => {
-  const chronological = [...history].reverse();
-  const values = chronological.map((item) => item.expectedProfit.divine);
-  const min = Math.min(...values, 0);
-  const max = Math.max(...values, 0);
-  const range = max - min || 1;
-
-  if (chronological.length === 0) {
-    return (
-      <div className='rounded border border-border bg-surface-soft px-4 py-8 text-base text-muted'>
-        No profitability history has been stored for this boss yet.
-      </div>
-    );
-  }
-
-  return (
-    <div className='rounded border border-border bg-black/20 p-4'>
-      <div className='flex h-36 items-end gap-2'>
-        {chronological.map((item) => {
-          const height = ((item.expectedProfit.divine - min) / range) * 100;
-          return (
-            <div
-              className='flex min-w-8 flex-1 flex-col items-center gap-2'
-              key={item.id}
-            >
-              <div
-                className={[
-                  'w-full rounded-t border border-white/10',
-                  item.expectedProfit.divine >= 0
-                    ? 'bg-profit/45'
-                    : 'bg-loss/45',
-                ].join(' ')}
-                style={{ height: `${Math.max(height, 8)}%` }}
-                title={`${formatDate(item.calculatedAt)}: ${
-                  item.expectedProfit.divine > 0 ? '+' : ''
-                }${item.expectedProfit.divine.toFixed(2)} div`}
-              />
-            </div>
-          );
-        })}
-      </div>
-      <div className='mt-3 flex justify-between text-base text-faint'>
-        <span>{formatDate(chronological[0].calculatedAt)}</span>
-        <span>
-          {formatDate(chronological[chronological.length - 1].calculatedAt)}
-        </span>
-      </div>
-    </div>
-  );
-};
+const backIconLinkClassName =
+  'inline-flex size-10 shrink-0 items-center justify-center rounded-md border border-border bg-surface-soft text-gold-bright transition hover:border-border-strong hover:bg-surface-soft/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-bright';
 
 export const BossDetailPage: FC = () => {
   const location = useLocation();
@@ -127,15 +74,20 @@ export const BossDetailPage: FC = () => {
       <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden px-4 py-8 sm:px-6 lg:px-8'>
         {leagueId ? (
           <Link
-            className='text-base text-gold-bright hover:text-white'
+            aria-label='Back to bosses'
+            className={backIconLinkClassName}
             params={{ leagueId }}
             to='/$leagueId/bosses'
           >
-            Back to bosses
+            <ArrowLeft aria-hidden='true' className='size-5' />
           </Link>
         ) : (
-          <Link className='text-base text-gold-bright hover:text-white' to='/'>
-            Back to bosses
+          <Link
+            aria-label='Back to bosses'
+            className={backIconLinkClassName}
+            to='/bosses'
+          >
+            <ArrowLeft aria-hidden='true' className='size-5' />
           </Link>
         )}
         <div className='mt-4 rounded border border-border bg-surface px-4 py-8 text-lg text-loss'>
@@ -155,46 +107,49 @@ export const BossDetailPage: FC = () => {
   const latest = detail.profit.latest ?? fallbackHistory[0];
 
   return (
-    <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden px-4 py-6 text-text sm:px-6 lg:px-8'>
-      {leagueId ? (
-        <Link
-          className='text-base font-semibold text-gold-bright hover:text-white'
-          params={{ leagueId }}
-          to='/$leagueId/bosses'
-        >
-          Back to bosses
-        </Link>
-      ) : (
-        <Link
-          className='text-base font-semibold text-gold-bright hover:text-white'
-          to='/'
-        >
-          Back to bosses
-        </Link>
-      )}
-
-      <div className='mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]'>
-        <div className='rounded-md border border-border bg-surface p-5 shadow-panel backdrop-blur-md'>
-          <div className='flex gap-3 items-center'>
-            {detail.boss.iconUrl && (
-              <img
-                src={detail.boss.iconUrl}
-                alt={detail.boss.name}
-                className='size-15 shrink-0'
-              />
-            )}
-            <h1 className='m-0 text-4xl font-semibold text-white'>
-              {detail.boss.name}
-            </h1>
+    <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden text-text'>
+      <div className='grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]'>
+        <div className='rounded-md border border-border bg-surface p-5 shadow-panel backdrop-blur-md flex gap-5'>
+          {leagueId ? (
+            <Link
+              aria-label='Back to bosses'
+              className={backIconLinkClassName}
+              params={{ leagueId }}
+              to='/$leagueId/bosses'
+            >
+              <ArrowLeft aria-hidden='true' className='size-5' />
+            </Link>
+          ) : (
+            <Link
+              aria-label='Back to bosses'
+              className={backIconLinkClassName}
+              to='/bosses'
+            >
+              <ArrowLeft aria-hidden='true' className='size-5' />
+            </Link>
+          )}
+          <div className='flex flex-col'>
+            <div className='flex gap-3 items-center'>
+              {detail.boss.iconUrl && (
+                <img
+                  src={detail.boss.iconUrl}
+                  alt={detail.boss.name}
+                  className='size-15 shrink-0'
+                />
+              )}
+              <h1 className='m-0 text-4xl font-semibold text-white'>
+                {detail.boss.name}
+              </h1>
+            </div>
+            <p className='mt-3 max-w-3xl text-lg leading-8 text-muted'>
+              {detail.boss.description ?? detail.boss.slug}
+            </p>
           </div>
-          <p className='mt-3 max-w-3xl text-lg leading-8 text-muted'>
-            {detail.boss.description ?? detail.boss.slug}
-          </p>
         </div>
 
         <div className='grid gap-4 rounded-md border border-border bg-surface p-4 shadow-panel backdrop-blur-md sm:grid-cols-3 lg:grid-cols-1'>
           <div className='flex items-center justify-between text-base'>
-            <span className='text-muted'>Entry cost</span>
+            <span className='text-muted'>Cost</span>
             <span className='font-semibold text-white sm:text-right lg:text-left'>
               <CurrencyAmount
                 chaosValue={detail.entry.totalPrice?.chaos}
@@ -205,7 +160,7 @@ export const BossDetailPage: FC = () => {
             </span>
           </div>
           <div className='flex items-center justify-between text-base'>
-            <span className='text-muted'>Latest profit</span>
+            <span className='text-muted'>Profit per run</span>
             <CurrencyAmount
               chaosValue={latest?.expectedProfit.chaos}
               className={[
@@ -220,7 +175,16 @@ export const BossDetailPage: FC = () => {
           </div>
           <div className='flex items-center justify-between text-base'>
             <span className='text-muted'>ROI</span>
-            <span className='font-semibold text-white sm:text-right lg:text-left'>
+            <span
+              className={cn(
+                'font-semibold text-white sm:text-right lg:text-left text-xl',
+                {
+                  'text-muted': !latest,
+                  'text-loss': latest?.expectedProfit.divine < 0,
+                  'text-profit': latest?.expectedProfit.divine >= 0,
+                },
+              )}
+            >
               {latest ? `${Math.round(latest.roiPercent)}%` : 'No data'}
             </span>
           </div>
@@ -262,7 +226,7 @@ export const BossDetailPage: FC = () => {
             Failed to load profit history.
           </div>
         ) : (
-          <HistoryChart history={profitHistory} />
+          <ProfitHistoryChart history={profitHistory} />
         )}
       </section>
 

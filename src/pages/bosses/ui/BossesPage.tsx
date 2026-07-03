@@ -13,7 +13,7 @@ const BossesPageLayout: FC<{
   leagueId: string | null;
 }> = ({ children, leagueId }) => {
   return (
-    <div className='grid gap-4 px-4 sm:px-6 lg:grid-cols-[14rem_minmax(0,1fr)] lg:px-8'>
+    <div className='grid gap-4 lg:grid-cols-[14rem_minmax(0,1fr)]'>
       <BossesNavigation leagueId={leagueId} />
       <div className='min-w-0'>{children}</div>
     </div>

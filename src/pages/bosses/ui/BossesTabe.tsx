@@ -28,7 +28,7 @@ const formatPercent = (value: number | null | undefined) => {
 
 const getColumns = (leagueId: string) => [
   columnHelper.accessor('name', {
-    header: 'Boss',
+    header: 'Boss name',
     cell: ({ row, getValue }) => (
       <Link
         className='text-xl font-semibold text-white transition hover:text-gold-bright flex gap-3 items-center'
@@ -44,7 +44,7 @@ const getColumns = (leagueId: string) => [
   }),
   columnHelper.accessor((row) => row.latestProfit?.entryCostChaos ?? 0, {
     id: 'entryCost',
-    header: 'Entry',
+    header: 'Cost',
     cell: ({ row }) => (
       <CurrencyAmount
         chaosValue={row.original.latestProfit?.entryCostChaos}

@@ -40,7 +40,7 @@ export const RootLayout: FC = () => {
         </div>
       </header>
 
-      <main className='relative z-10 py-20 max-w-page mx-auto'>
+      <main className='relative z-10 py-20 max-w-page mx-auto px-4 sm:px-6 lg:px-8'>
         <Outlet />
       </main>
     </div>
