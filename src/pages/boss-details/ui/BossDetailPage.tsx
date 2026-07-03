@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useLocation, useParams } from '@tanstack/react-router';
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { bossService } from '@/entities/boss';
 import { queryKeys } from '@/shared/api';
 import { CurrencyAmount, UISkeleton } from '@/shared/ui';
@@ -20,6 +21,7 @@ const backIconLinkClassName =
 
 export const BossDetailPage: FC = () => {
   const location = useLocation();
+  const { t } = useTranslation();
   const { bossId } = useParams({ strict: false });
   const leagueId = getLeagueIdFromPathname(location.pathname);
   const detailQuery = useQuery({
@@ -74,7 +76,7 @@ export const BossDetailPage: FC = () => {
       <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden px-4 py-8 sm:px-6 lg:px-8'>
         {leagueId ? (
           <Link
-            aria-label='Back to bosses'
+            aria-label={t('bossDetail.backToBosses')}
             className={backIconLinkClassName}
             params={{ leagueId }}
             to='/$leagueId/bosses'
@@ -83,7 +85,7 @@ export const BossDetailPage: FC = () => {
           </Link>
         ) : (
           <Link
-            aria-label='Back to bosses'
+            aria-label={t('bossDetail.backToBosses')}
             className={backIconLinkClassName}
             to='/bosses'
           >
@@ -91,7 +93,7 @@ export const BossDetailPage: FC = () => {
           </Link>
         )}
         <div className='mt-4 rounded border border-border bg-surface px-4 py-8 text-lg text-loss'>
-          Failed to load boss details.
+          {t('bossDetail.errors.details')}
         </div>
       </section>
     );
@@ -112,7 +114,7 @@ export const BossDetailPage: FC = () => {
         <div className='rounded-md border border-border bg-surface p-5 shadow-panel backdrop-blur-md flex gap-5'>
           {leagueId ? (
             <Link
-              aria-label='Back to bosses'
+              aria-label={t('bossDetail.backToBosses')}
               className={backIconLinkClassName}
               params={{ leagueId }}
               to='/$leagueId/bosses'
@@ -121,7 +123,7 @@ export const BossDetailPage: FC = () => {
             </Link>
           ) : (
             <Link
-              aria-label='Back to bosses'
+              aria-label={t('bossDetail.backToBosses')}
               className={backIconLinkClassName}
               to='/bosses'
             >
@@ -149,18 +151,18 @@ export const BossDetailPage: FC = () => {
 
         <div className='grid gap-4 rounded-md border border-border bg-surface p-4 shadow-panel backdrop-blur-md sm:grid-cols-3 lg:grid-cols-1'>
           <div className='flex items-center justify-between text-base'>
-            <span className='text-muted'>Cost</span>
+            <span className='text-muted'>{t('bossDetail.cost')}</span>
             <span className='font-semibold text-white sm:text-right lg:text-left'>
               <CurrencyAmount
                 chaosValue={detail.entry.totalPrice?.chaos}
                 className='justify-end text-xl font-semibold lg:justify-start'
                 divineValue={detail.entry.totalPrice?.divine}
-                fallback='Unknown'
+                fallback={t('common.unknown')}
               />
             </span>
           </div>
           <div className='flex items-center justify-between text-base'>
-            <span className='text-muted'>Profit per run</span>
+            <span className='text-muted'>{t('bossDetail.profitPerRun')}</span>
             <CurrencyAmount
               chaosValue={latest?.expectedProfit.chaos}
               className={[
@@ -174,7 +176,7 @@ export const BossDetailPage: FC = () => {
             />
           </div>
           <div className='flex items-center justify-between text-base'>
-            <span className='text-muted'>ROI</span>
+            <span className='text-muted'>{t('bosses.table.roi')}</span>
             <span
               className={cn(
                 'font-semibold text-white sm:text-right lg:text-left text-xl',
@@ -185,7 +187,9 @@ export const BossDetailPage: FC = () => {
                 },
               )}
             >
-              {latest ? `${Math.round(latest.roiPercent)}%` : 'No data'}
+              {latest
+                ? `${Math.round(latest.roiPercent)}%`
+                : t('common.noData')}
             </span>
           </div>
         </div>
@@ -199,10 +203,12 @@ export const BossDetailPage: FC = () => {
       <section className='mt-4 rounded-md border border-border bg-surface p-4 shadow-panel backdrop-blur-md'>
         <div className='mb-3 flex items-center justify-between gap-4'>
           <h2 className='m-0 text-base font-semibold uppercase text-faint'>
-            Profit History
+            {t('bossDetail.history.title')}
           </h2>
           <span className='text-base text-muted'>
-            {profitHistory.length} stored snapshots
+            {t('bossDetail.history.snapshotsCount', {
+              count: profitHistory.length,
+            })}
           </span>
         </div>
         {isHistoryLoading ? (
@@ -223,7 +229,7 @@ export const BossDetailPage: FC = () => {
           </div>
         ) : isHistoryError ? (
           <div className='rounded border border-border bg-surface-soft px-4 py-8 text-base text-loss'>
-            Failed to load profit history.
+            {t('bossDetail.errors.history')}
           </div>
         ) : (
           <ProfitHistoryChart history={profitHistory} />

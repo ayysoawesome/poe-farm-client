@@ -7,7 +7,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { TProfitResponse } from '@/entities/boss';
 import { CurrencyAmount, SortIcon } from '@/shared/ui';
 
@@ -15,8 +16,8 @@ interface IProfitSnapshotsTableProps {
   snapshots: TProfitResponse[];
 }
 
-const formatDate = (timestamp: number) =>
-  new Intl.DateTimeFormat('en', {
+const formatDate = (timestamp: number, language: string) =>
+  new Intl.DateTimeFormat(language, {
     month: 'short',
     day: '2-digit',
     hour: '2-digit',
@@ -28,16 +29,19 @@ const getProfitTone = (profit: number) =>
 
 const columnHelper = createColumnHelper<TProfitResponse>();
 
-const columns = [
+const getColumns = (
+  t: ReturnType<typeof useTranslation>['t'],
+  language: string,
+) => [
   columnHelper.accessor('calculatedAt', {
-    header: 'Calculated',
+    header: t('bossDetail.snapshots.calculated'),
     cell: ({ getValue }) => (
-      <span className='text-muted'>{formatDate(getValue())}</span>
+      <span className='text-muted'>{formatDate(getValue(), language)}</span>
     ),
   }),
   columnHelper.accessor((row) => row.entryCost.chaos, {
     id: 'entryCost',
-    header: 'Cost',
+    header: t('bosses.table.cost'),
     cell: ({ row }) => (
       <CurrencyAmount
         chaosValue={row.original.entryCost.chaos}
@@ -48,7 +52,7 @@ const columns = [
   }),
   columnHelper.accessor((row) => row.expectedReturn.chaos, {
     id: 'expectedReturn',
-    header: 'Return',
+    header: t('bosses.table.expectedReturn'),
     cell: ({ row }) => (
       <CurrencyAmount
         chaosValue={row.original.expectedReturn.chaos}
@@ -59,7 +63,7 @@ const columns = [
   }),
   columnHelper.accessor((row) => row.expectedProfit.chaos, {
     id: 'expectedProfit',
-    header: 'Profit',
+    header: t('bosses.table.profit'),
     cell: ({ row }) => (
       <CurrencyAmount
         chaosValue={row.original.expectedProfit.chaos}
@@ -73,7 +77,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor('roiPercent', {
-    header: 'ROI',
+    header: t('bosses.table.roi'),
     cell: ({ getValue }) => (
       <span className='block text-right text-white'>
         {Math.round(getValue())}%
@@ -81,7 +85,7 @@ const columns = [
     ),
   }),
   columnHelper.accessor('unknownDropCount', {
-    header: 'Unknown drops',
+    header: t('bossDetail.snapshots.unknownDrops'),
     cell: ({ getValue }) => (
       <span className='block text-right text-muted'>{getValue()}</span>
     ),
@@ -91,7 +95,10 @@ const columns = [
 export const ProfitSnapshotsTable: FC<IProfitSnapshotsTableProps> = ({
   snapshots,
 }) => {
+  const { i18n, t } = useTranslation();
+  const language = i18n.resolvedLanguage ?? i18n.language;
   const [sorting, setSorting] = useState<SortingState>([]);
+  const columns = useMemo(() => getColumns(t, language), [language, t]);
   const table = useReactTable({
     columns,
     data: snapshots,
@@ -107,7 +114,7 @@ export const ProfitSnapshotsTable: FC<IProfitSnapshotsTableProps> = ({
     <section className='mt-4 rounded-md border border-border bg-surface shadow-panel backdrop-blur-md'>
       <div className='border-b border-border bg-surface-strong px-4 py-3'>
         <h2 className='m-0 text-base font-semibold uppercase text-faint'>
-          Stored Snapshots
+          {t('bossDetail.snapshots.title')}
         </h2>
       </div>
       <div className='overflow-x-auto'>

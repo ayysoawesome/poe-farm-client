@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CHAOS_ORB_ICON_URL, DIVINE_ORB_ICON_URL } from '@/shared/assets';
 import { cn } from '@/shared/lib';
 
@@ -12,15 +13,15 @@ interface ICurrencyAmountProps {
   fallback?: string;
 }
 
-const formatNumber = (value: number) => {
+const formatNumber = (value: number, language: string) => {
   const rounded =
     Math.abs(value) >= 10 ? Math.round(value) : Number(value.toFixed(1));
 
-  return rounded.toLocaleString('en');
+  return rounded.toLocaleString(language);
 };
 
-const formatChaos = (value: number) => {
-  return Math.round(value).toLocaleString('en');
+const formatChaos = (value: number, language: string) => {
+  return Math.round(value).toLocaleString(language);
 };
 
 export const CurrencyAmount: FC<ICurrencyAmountProps> = ({
@@ -30,8 +31,10 @@ export const CurrencyAmount: FC<ICurrencyAmountProps> = ({
   signed = false,
   className,
   iconClassName,
-  fallback = 'No data',
+  fallback,
 }) => {
+  const { i18n, t } = useTranslation();
+  const language = i18n.resolvedLanguage ?? i18n.language;
   const resolvedDivineValue =
     divineValue ??
     (chaosValue !== null && chaosValue !== undefined && divineOrbChaosValue
@@ -43,7 +46,7 @@ export const CurrencyAmount: FC<ICurrencyAmountProps> = ({
     resolvedDivineValue === undefined ||
     Number.isNaN(resolvedDivineValue)
   ) {
-    return <span className='text-muted'>{fallback}</span>;
+    return <span className='text-muted'>{fallback ?? t('common.noData')}</span>;
   }
 
   const canUseChaos = chaosValue !== null && chaosValue !== undefined;
@@ -54,7 +57,9 @@ export const CurrencyAmount: FC<ICurrencyAmountProps> = ({
   return (
     <span className={cn('inline-flex items-center gap-1.5', className)}>
       {sign}
-      {shouldUseChaos ? formatChaos(displayValue) : formatNumber(displayValue)}
+      {shouldUseChaos
+        ? formatChaos(displayValue, language)
+        : formatNumber(displayValue, language)}
       <img
         alt=''
         className={cn('size-7 shrink-0', iconClassName)}

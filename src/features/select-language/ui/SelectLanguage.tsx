@@ -1,6 +1,10 @@
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { supportedLanguages, type TLanguage } from '@/shared/i18n';
+import {
+  setStoredLanguage,
+  supportedLanguages,
+  type TLanguage,
+} from '@/shared/i18n';
 import { UISelect, type IUISelectOption } from '@/shared/ui';
 import { LanguageFlag } from './LanguageFlag';
 
@@ -19,6 +23,7 @@ export const SelectLanguage: FC = () => {
 
   const handleLanguageChange = (language: TLanguage) => {
     void i18n.changeLanguage(language);
+    setStoredLanguage(language);
   };
 
   return (

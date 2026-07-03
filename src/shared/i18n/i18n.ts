@@ -1,7 +1,10 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { en } from './locales/en';
+import { ru } from './locales/ru';
 
 export const DEFAULT_LANGUAGE = 'en';
+export const LANGUAGE_STORAGE_KEY = 'poe-farm.language';
 
 export const supportedLanguages = [
   { code: 'en', flagCode: 'us', label: 'EN' },
@@ -12,63 +15,44 @@ export type TLanguage = (typeof supportedLanguages)[number]['code'];
 
 const resources = {
   en: {
-    translation: {
-      app: {
-        subtitle: 'Boss profitability',
-      },
-      language: {
-        label: 'Language',
-      },
-      market: {
-        noData: 'No data',
-        relative: {
-          hour_one: '{{count}} hour ago',
-          hour_other: '{{count}} hours ago',
-          minute_one: '{{count}} minute ago',
-          minute_other: '{{count}} minutes ago',
-          second_one: '{{count}} second ago',
-          second_other: '{{count}} seconds ago',
-        },
-        updated: 'Updated',
-      },
-    },
+    translation: en,
   },
   ru: {
-    translation: {
-      app: {
-        subtitle: 'Доходность боссов',
-      },
-      language: {
-        label: 'Язык',
-      },
-      market: {
-        noData: 'Нет данных',
-        relative: {
-          hour_few: '{{count}} ч. назад',
-          hour_many: '{{count}} ч. назад',
-          hour_one: '{{count}} ч. назад',
-          hour_other: '{{count}} ч. назад',
-          minute_few: '{{count}} мин. назад',
-          minute_many: '{{count}} мин. назад',
-          minute_one: '{{count}} мин. назад',
-          minute_other: '{{count}} мин. назад',
-          second_few: '{{count}} сек. назад',
-          second_many: '{{count}} сек. назад',
-          second_one: '{{count}} сек. назад',
-          second_other: '{{count}} сек. назад',
-        },
-        updated: 'Обновлено',
-      },
-    },
+    translation: ru,
   },
 } satisfies Record<TLanguage, { translation: object }>;
+
+export const isSupportedLanguage = (language: string): language is TLanguage =>
+  supportedLanguages.some((supportedLanguage) => {
+    return supportedLanguage.code === language;
+  });
+
+export const getStoredLanguage = (): TLanguage | null => {
+  if (typeof localStorage === 'undefined') {
+    return null;
+  }
+
+  const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+
+  return storedLanguage && isSupportedLanguage(storedLanguage)
+    ? storedLanguage
+    : null;
+};
+
+export const setStoredLanguage = (language: TLanguage) => {
+  if (typeof localStorage === 'undefined') {
+    return;
+  }
+
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+};
 
 export const createAppI18n = () => {
   const instance = i18next.createInstance();
 
   void instance.use(initReactI18next).init({
     resources,
-    lng: DEFAULT_LANGUAGE,
+    lng: getStoredLanguage() ?? DEFAULT_LANGUAGE,
     fallbackLng: DEFAULT_LANGUAGE,
     supportedLngs: supportedLanguages.map((language) => language.code),
     interpolation: {

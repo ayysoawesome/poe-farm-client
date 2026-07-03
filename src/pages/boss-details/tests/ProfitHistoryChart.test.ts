@@ -52,6 +52,16 @@ describe('buildProfitHistoryChartData', () => {
       }),
     ]);
   });
+
+  it('formats labels with the requested language', () => {
+    const timestamp = Date.UTC(2026, 0, 5, 13, 30);
+    const [point] = buildProfitHistoryChartData(
+      [createSnapshot('snapshot', timestamp, 2, 5, 3)],
+      'ru',
+    );
+
+    expect(point.label).toContain('янв.');
+  });
 });
 
 describe('getProfitHistoryChartDomain', () => {

@@ -17,11 +17,15 @@ interface IGetMarketStatusDisplayProps {
   rateValue?: number | null;
   status?: TFreshnessStatus | null;
   formatRelativeTime?: TRelativeTimeFormatter;
+  language?: string;
   now?: number;
 }
 
-export const formatDivineChaosRate = (value: number): string => {
-  return value.toLocaleString('en', {
+export const formatDivineChaosRate = (
+  value: number,
+  language = 'en',
+): string => {
+  return value.toLocaleString(language, {
     maximumFractionDigits: 1,
     minimumFractionDigits: 0,
   });
@@ -76,6 +80,7 @@ export const getMarketStatusDisplay = ({
   rateValue,
   status,
   formatRelativeTime,
+  language,
   now,
 }: IGetMarketStatusDisplayProps): {
   freshness: TMarketStatusDisplayValue;
@@ -88,7 +93,7 @@ export const getMarketStatusDisplay = ({
           kind: 'text',
           value:
             rateValue !== null && rateValue !== undefined
-              ? formatDivineChaosRate(rateValue)
+              ? formatDivineChaosRate(rateValue, language)
               : noDataText,
         },
     freshness: isFreshnessLoading

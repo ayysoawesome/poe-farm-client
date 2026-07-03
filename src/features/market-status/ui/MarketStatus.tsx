@@ -26,7 +26,8 @@ const MarketStatusValue: FC<{
 
 export const MarketStatus: FC = () => {
   const location = useLocation();
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const language = i18n.resolvedLanguage ?? i18n.language;
   const leagueId = getLeagueIdFromPathname(location.pathname);
 
   const rateQuery = useQuery({
@@ -51,6 +52,7 @@ export const MarketStatus: FC = () => {
     isFreshnessLoading: freshnessQuery.isLoading,
     isRateLoading: rateQuery.isLoading,
     noDataText: t('market.noData'),
+    language,
     rateValue: rateQuery.data?.chaosValue,
     status: freshnessQuery.data,
   });

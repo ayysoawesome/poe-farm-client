@@ -1,0 +1,88 @@
+export const ru = {
+  app: {
+    subtitle: 'Доходность боссов',
+  },
+  bossDetail: {
+    backToBosses: 'Назад к боссам',
+    cost: 'Стоимость',
+    drops: 'Дроп',
+    entry: 'Вход',
+    errors: {
+      details: 'Не удалось загрузить детали босса.',
+      history: 'Не удалось загрузить историю прибыли.',
+    },
+    history: {
+      chartLabel: 'График истории прибыли',
+      empty: 'История доходности для этого босса пока не сохранена.',
+      entryCost: 'Стоимость входа',
+      expectedProfit: 'Прибыль',
+      expectedReturn: 'Выручка',
+      roi: 'ROI {{value}}%',
+      snapshotsCount_one: '{{count}} сохраненный снимок',
+      snapshotsCount_few: '{{count}} сохраненных снимка',
+      snapshotsCount_many: '{{count}} сохраненных снимков',
+      snapshotsCount_other: '{{count}} сохраненного снимка',
+      title: 'История прибыли',
+    },
+    profitPerRun: 'Прибыль за забег',
+    snapshots: {
+      calculated: 'Рассчитано',
+      title: 'Сохраненные снимки',
+      unknownDrops: 'Неизвестный дроп',
+    },
+  },
+  bosses: {
+    comingSoon: 'Скоро',
+    errors: {
+      list: 'Не удалось загрузить боссов.',
+    },
+    navigationLabel: 'Разделы экономики',
+    title: 'Боссы',
+    table: {
+      bossName: 'Имя босса',
+      cost: 'Стоимость',
+      expectedReturn: 'Выручка',
+      profit: 'Прибыль',
+      roi: 'ROI',
+    },
+  },
+  common: {
+    chance: 'Шанс',
+    item: 'Предмет',
+    noData: 'Нет данных',
+    price: 'Цена',
+    quantity: 'Кол-во',
+    total: 'Итого',
+    unit: 'За штуку',
+    unknown: 'Неизвестно',
+  },
+  language: {
+    label: 'Язык',
+  },
+  league: {
+    errors: {
+      list: 'Не удалось загрузить лиги.',
+    },
+    label: 'Лига',
+    loading: 'Загрузка лиг...',
+    placeholder: 'Выберите лигу',
+  },
+  market: {
+    noData: 'Нет данных',
+    relative: {
+      hour_few: '{{count}} ч. назад',
+      hour_many: '{{count}} ч. назад',
+      hour_one: '{{count}} ч. назад',
+      hour_other: '{{count}} ч. назад',
+      minute_few: '{{count}} мин. назад',
+      minute_many: '{{count}} мин. назад',
+      minute_one: '{{count}} мин. назад',
+      minute_other: '{{count}} мин. назад',
+      second_few: '{{count}} сек. назад',
+      second_many: '{{count}} сек. назад',
+      second_one: '{{count}} сек. назад',
+      second_other: '{{count}} сек. назад',
+    },
+    updated: 'Обновлено',
+  },
+} as const;

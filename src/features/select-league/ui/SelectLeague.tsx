@@ -1,6 +1,7 @@
 import { useEffect, useMemo, type FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { leagueService, type TLeague } from '@/entities/league';
 import { queryKeys } from '@/shared/api';
 import { UISelect } from '@/shared/ui';
@@ -15,6 +16,7 @@ const EMPTY_LEAGUES: TLeague[] = [];
 export const SelectLeague: FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const leaguesQuery = useQuery({
     queryKey: queryKeys.leagues.all,
     queryFn: () => leagueService.getLeagues(),
@@ -54,16 +56,16 @@ export const SelectLeague: FC = () => {
 
   return (
     <UISelect
-      label='League'
+      label={t('league.label')}
       options={options}
       value={selectedLeagueId}
       onValueChange={handleValueChange}
       placeholder={
         leaguesQuery.isLoading
-          ? 'Loading leagues...'
+          ? t('league.loading')
           : leaguesQuery.isError
-            ? 'Failed to load leagues'
-            : 'Select league'
+            ? t('league.errors.list')
+            : t('league.placeholder')
       }
       disabled={leaguesQuery.isLoading || leaguesQuery.isError}
       className='w-full sm:w-56'

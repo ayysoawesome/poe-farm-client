@@ -9,6 +9,7 @@ import {
 import { Link } from '@tanstack/react-router';
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { type TBossWithProfit } from '@/entities/boss';
 import { CurrencyAmount, SortIcon } from '@/shared/ui';
 import { cn } from '@/shared/lib';
@@ -20,15 +21,18 @@ interface IBossesTableProps {
 
 const columnHelper = createColumnHelper<TBossWithProfit>();
 
-const formatPercent = (value: number | null | undefined) => {
-  if (value === null || value === undefined) return 'No data';
+const formatPercent = (
+  value: number | null | undefined,
+  noDataText: string,
+) => {
+  if (value === null || value === undefined) return noDataText;
 
   return `${Math.round(value)}%`;
 };
 
-const getColumns = (leagueId: string) => [
+const getColumns = (leagueId: string, t: ReturnType<typeof useTranslation>['t']) => [
   columnHelper.accessor('name', {
-    header: 'Boss name',
+    header: t('bosses.table.bossName'),
     cell: ({ row, getValue }) => (
       <Link
         className='text-xl font-semibold text-white transition hover:text-gold-bright flex gap-3 items-center'
@@ -44,7 +48,7 @@ const getColumns = (leagueId: string) => [
   }),
   columnHelper.accessor((row) => row.latestProfit?.entryCostChaos ?? 0, {
     id: 'entryCost',
-    header: 'Cost',
+    header: t('bosses.table.cost'),
     cell: ({ row }) => (
       <CurrencyAmount
         chaosValue={row.original.latestProfit?.entryCostChaos}
@@ -55,7 +59,7 @@ const getColumns = (leagueId: string) => [
   }),
   columnHelper.accessor((row) => row.latestProfit?.expectedReturnChaos ?? 0, {
     id: 'expectedReturn',
-    header: 'Return',
+    header: t('bosses.table.expectedReturn'),
     cell: ({ row }) => (
       <CurrencyAmount
         chaosValue={row.original.latestProfit?.expectedReturnChaos}
@@ -66,7 +70,7 @@ const getColumns = (leagueId: string) => [
   }),
   columnHelper.accessor((row) => row.latestProfit?.expectedProfitChaos ?? 0, {
     id: 'expectedProfit',
-    header: 'Profit',
+    header: t('bosses.table.profit'),
     cell: ({ row }) => {
       const profit = row.original.latestProfit?.expectedProfitChaos;
 
@@ -85,7 +89,7 @@ const getColumns = (leagueId: string) => [
   }),
   columnHelper.accessor((row) => row.latestProfit?.roiPercent ?? 0, {
     id: 'roi',
-    header: 'ROI',
+    header: t('bosses.table.roi'),
     cell: ({ getValue }) => (
       <span
         className={cn('block text-right text-xl font-semibold text-white', {
@@ -93,20 +97,21 @@ const getColumns = (leagueId: string) => [
           'text-profit': getValue() > 0,
         })}
       >
-        {formatPercent(getValue())}
+        {formatPercent(getValue(), t('common.noData'))}
       </span>
     ),
   }),
 ];
 
 export const BossesTable: FC<IBossesTableProps> = ({ data, leagueId }) => {
+  const { t } = useTranslation();
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: 'expectedProfit',
       desc: true,
     },
   ]);
-  const columns = useMemo(() => getColumns(leagueId), [leagueId]);
+  const columns = useMemo(() => getColumns(leagueId, t), [leagueId, t]);
 
   const table = useReactTable({
     columns,

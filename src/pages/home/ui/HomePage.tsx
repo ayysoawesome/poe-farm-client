@@ -1,6 +1,7 @@
 import { useEffect, type FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { leagueService } from '@/entities/league';
 import { queryKeys } from '@/shared/api';
 import { UISkeleton } from '@/shared/ui';
@@ -8,6 +9,7 @@ import { getDefaultLeague } from '@/features/select-league/model/selectLeague';
 
 export const HomePage: FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const leaguesQuery = useQuery({
     queryKey: queryKeys.leagues.all,
     queryFn: () => leagueService.getLeagues(),
@@ -29,7 +31,7 @@ export const HomePage: FC = () => {
     return (
       <section className='px-4 sm:px-6 lg:px-8'>
         <div className='rounded-md border border-border bg-surface px-5 py-4 text-lg text-loss'>
-          Failed to load leagues.
+          {t('league.errors.list')}
         </div>
       </section>
     );

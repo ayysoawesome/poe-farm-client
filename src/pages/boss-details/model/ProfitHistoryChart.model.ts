@@ -12,25 +12,27 @@ export interface IProfitHistoryChartPoint {
 
 const singlePointDomainPaddingMs = 30 * 60 * 1000;
 
-const chartDateFormatter = new Intl.DateTimeFormat('en', {
-  month: 'short',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-});
-
-export const formatProfitHistoryChartDate = (timestamp: number) =>
-  chartDateFormatter.format(timestamp);
+export const formatProfitHistoryChartDate = (
+  timestamp: number,
+  language: string,
+) =>
+  new Intl.DateTimeFormat(language, {
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(timestamp);
 
 export const buildProfitHistoryChartData = (
   history: TProfitResponse[],
+  language = 'en',
 ): IProfitHistoryChartPoint[] =>
   [...history]
     .sort((left, right) => left.calculatedAt - right.calculatedAt)
     .map((snapshot) => ({
       id: snapshot.id,
       timestamp: snapshot.calculatedAt,
-      label: formatProfitHistoryChartDate(snapshot.calculatedAt),
+      label: formatProfitHistoryChartDate(snapshot.calculatedAt, language),
       entryCost: snapshot.entryCost.divine,
       expectedReturn: snapshot.expectedReturn.divine,
       expectedProfit: snapshot.expectedProfit.divine,
