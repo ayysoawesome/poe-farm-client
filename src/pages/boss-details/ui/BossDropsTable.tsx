@@ -18,6 +18,15 @@ type TDropRow = {
   skipQuantityCell?: boolean;
 };
 
+type TDropTableColumnKey = 'item' | 'quantity' | 'chance' | 'price';
+
+type TDropTableColumn = {
+  headerLabelKey: string;
+  key: TDropTableColumnKey;
+  mobileHidden: boolean;
+  widthClassName: string;
+};
+
 interface IBossDropsTableProps {
   drops: TDrop[];
   dropGroups: TDropGroup[];
@@ -75,6 +84,39 @@ const getDropRows = (
   return [...dropRows, ...groupRows];
 };
 
+export const getBossDropsTableColumns = (
+  showQuantity: boolean,
+): TDropTableColumn[] => [
+  {
+    headerLabelKey: 'common.item',
+    key: 'item',
+    mobileHidden: false,
+    widthClassName: 'w-auto',
+  },
+  ...(showQuantity
+    ? [
+        {
+          headerLabelKey: 'bossDetail.dropsTable.quantityShort',
+          key: 'quantity',
+          mobileHidden: true,
+          widthClassName: 'w-14',
+        } satisfies TDropTableColumn,
+      ]
+    : []),
+  {
+    headerLabelKey: 'bossDetail.dropsTable.chanceShort',
+    key: 'chance',
+    mobileHidden: true,
+    widthClassName: 'w-20',
+  },
+  {
+    headerLabelKey: 'common.price',
+    key: 'price',
+    mobileHidden: false,
+    widthClassName: 'w-24',
+  },
+];
+
 export const BossDropsTable: FC<IBossDropsTableProps> = ({
   dropGroups,
   drops,
@@ -86,15 +128,21 @@ export const BossDropsTable: FC<IBossDropsTableProps> = ({
     [dropGroups, drops, selectedVariantId],
   );
   const showQuantity = rows.some((row) => row.quantity && row.quantity !== 1);
+  const columns = getBossDropsTableColumns(showQuantity);
 
-  const renderHeader = (label: string, align: 'left' | 'right' = 'left') => (
+  const renderHeader = (
+    column: TDropTableColumn,
+    align: 'left' | 'right' = 'left',
+  ) => (
     <th
       className={[
-        'px-3 py-3 font-semibold uppercase text-faint',
+        'px-3 py-3 font-semibold uppercase text-faint whitespace-nowrap',
+        column.mobileHidden ? 'hidden sm:table-cell' : '',
         align === 'right' ? 'text-right' : 'text-left',
       ].join(' ')}
+      key={column.key}
     >
-      {label}
+      {t(column.headerLabelKey)}
     </th>
   );
 
@@ -106,60 +154,87 @@ export const BossDropsTable: FC<IBossDropsTableProps> = ({
         </h2>
       </div>
       <table className='w-full table-fixed border-collapse text-sm sm:text-base'>
+        <colgroup>
+          {columns.map((column) => (
+            <col
+              className={[
+                column.widthClassName,
+                column.mobileHidden ? 'hidden sm:table-column' : '',
+              ].join(' ')}
+              key={column.key}
+            />
+          ))}
+        </colgroup>
         <thead className='border-b border-border text-left text-sm uppercase text-faint sm:text-base'>
           <tr>
-            {renderHeader(t('common.item'))}
-            {showQuantity ? renderHeader(t('common.quantity'), 'right') : null}
-            {renderHeader(t('common.chance'), 'right')}
-            {renderHeader(t('common.price'), 'right')}
+            {columns.map((column) =>
+              renderHeader(column, column.key === 'item' ? 'left' : 'right'),
+            )}
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
-            <tr
-              className='border-b border-white/[0.06] last:border-b-0'
-              key={row.id}
-            >
-              <td className='min-w-0 px-3 py-3 align-middle'>
-                <div className='flex min-w-0 items-center gap-2'>
-                  {row.item.iconUrl && (
-                    <img
-                      src={row.item.iconUrl}
-                      alt={row.item.name}
-                      className='size-6 shrink-0 sm:size-7'
-                    />
-                  )}
-                  <span className='min-w-0 truncate font-semibold text-white'>
-                    {row.item.name}
-                  </span>
-                </div>
-              </td>
-              {showQuantity && row.quantityRowSpan ? (
-                <td
-                  className='w-16 px-3 py-3 text-right align-middle font-semibold text-white'
-                  rowSpan={row.quantityRowSpan}
-                >
-                  {row.quantity}
+          {rows.map((row) => {
+            const quantity = row.quantity ?? 1;
+            const chance = formatPercent(row.dropRate, t('common.unknown'));
+
+            return (
+              <tr
+                className='border-b border-white/[0.06] last:border-b-0'
+                key={row.id}
+              >
+                <td className='min-w-0 px-3 py-3 align-middle'>
+                  <div className='flex min-w-0 items-center gap-2'>
+                    {row.item.iconUrl && (
+                      <img
+                        src={row.item.iconUrl}
+                        alt={row.item.name}
+                        className='size-6 shrink-0 sm:size-7'
+                      />
+                    )}
+                    <div className='min-w-0'>
+                      <span className='block min-w-0 truncate font-semibold text-white'>
+                        {row.item.name}
+                      </span>
+                      <div className='mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted sm:hidden'>
+                        {showQuantity ? (
+                          <span>
+                            {t('common.quantity')}: {quantity}
+                          </span>
+                        ) : null}
+                        <span>
+                          {t('common.chance')}: {chance}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </td>
-              ) : showQuantity && !row.skipQuantityCell ? (
-                <td className='w-16 px-3 py-3 text-right align-middle text-muted'>
-                  1
+                {showQuantity && row.quantityRowSpan ? (
+                  <td
+                    className='hidden px-3 py-3 text-right align-middle font-semibold whitespace-nowrap text-white sm:table-cell'
+                    rowSpan={row.quantityRowSpan}
+                  >
+                    {row.quantity}
+                  </td>
+                ) : showQuantity && !row.skipQuantityCell ? (
+                  <td className='hidden px-3 py-3 text-right align-middle whitespace-nowrap text-muted sm:table-cell'>
+                    1
+                  </td>
+                ) : null}
+                <td className='hidden px-3 py-3 text-right align-middle whitespace-nowrap text-muted sm:table-cell'>
+                  {chance}
                 </td>
-              ) : null}
-              <td className='w-20 px-3 py-3 text-right align-middle text-muted'>
-                {formatPercent(row.dropRate, t('common.unknown'))}
-              </td>
-              <td className='w-24 px-3 py-3 align-middle'>
-                <CurrencyAmount
-                  chaosValue={row.price?.chaos}
-                  className='w-full justify-end font-semibold'
-                  divineValue={row.price?.divine}
-                  fallback={t('common.unknown')}
-                  iconClassName='size-5 sm:size-6'
-                />
-              </td>
-            </tr>
-          ))}
+                <td className='px-3 py-3 align-middle'>
+                  <CurrencyAmount
+                    chaosValue={row.price?.chaos}
+                    className='w-full justify-end font-semibold whitespace-nowrap'
+                    divineValue={row.price?.divine}
+                    fallback={t('common.unknown')}
+                    iconClassName='size-5 sm:size-6'
+                  />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </section>

@@ -7,6 +7,10 @@ export const ru = {
     cost: 'Стоимость',
     drops: 'Дроп',
     entry: 'Вход',
+    dropsTable: {
+      chanceShort: '\u0428\u0430\u043d\u0441',
+      quantityShort: '\u041a\u043e\u043b-\u0432\u043e',
+    },
     errors: {
       details: 'Не удалось загрузить детали босса.',
       history: 'Не удалось загрузить историю прибыли.',

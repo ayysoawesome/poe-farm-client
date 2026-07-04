@@ -17,6 +17,7 @@ import { CurrencyAmount } from '@/shared/ui';
 import {
   buildProfitHistoryChartData,
   formatProfitHistoryChartDate,
+  getProfitHistoryChartTooltipCurrency,
   getProfitHistoryChartDomain,
   type IProfitHistoryChartPoint,
 } from '../model/ProfitHistoryChart.model';
@@ -45,6 +46,13 @@ const ProfitHistoryTooltip: FC<TooltipContentProps> = ({
         {payload.map((item) => {
           const dataKey = String(item.dataKey ?? item.name);
           const labelKey = `bossDetail.history.${dataKey}`;
+          const currency = point
+            ? getProfitHistoryChartTooltipCurrency(point, dataKey)
+            : {
+                chaosValue: undefined,
+                divineValue:
+                  typeof item.value === 'number' ? item.value : undefined,
+              };
 
           return (
             <div
@@ -54,9 +62,8 @@ const ProfitHistoryTooltip: FC<TooltipContentProps> = ({
               <span className='text-muted'>{t(labelKey)}</span>
               <CurrencyAmount
                 className='justify-end text-right font-semibold text-white'
-                divineValue={
-                  typeof item.value === 'number' ? item.value : undefined
-                }
+                chaosValue={currency.chaosValue}
+                divineValue={currency.divineValue}
                 fallback='-'
                 iconClassName='size-5'
               />

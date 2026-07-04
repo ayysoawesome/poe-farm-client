@@ -5,12 +5,29 @@ export interface IProfitHistoryChartPoint {
   timestamp: number;
   label: string;
   entryCost: number;
+  entryCostChaos: number;
   expectedReturn: number;
+  expectedReturnChaos: number;
   expectedProfit: number;
+  expectedProfitChaos: number;
   roiPercent: number;
 }
 
+type TProfitHistoryChartCurrencyKey =
+  | 'entryCost'
+  | 'expectedReturn'
+  | 'expectedProfit';
+
 const singlePointDomainPaddingMs = 30 * 60 * 1000;
+
+const chaosValueByCurrencyKey = {
+  entryCost: 'entryCostChaos',
+  expectedReturn: 'expectedReturnChaos',
+  expectedProfit: 'expectedProfitChaos',
+} as const satisfies Record<
+  TProfitHistoryChartCurrencyKey,
+  keyof IProfitHistoryChartPoint
+>;
 
 export const formatProfitHistoryChartDate = (
   timestamp: number,
@@ -34,10 +51,36 @@ export const buildProfitHistoryChartData = (
       timestamp: snapshot.calculatedAt,
       label: formatProfitHistoryChartDate(snapshot.calculatedAt, language),
       entryCost: snapshot.entryCost.divine,
+      entryCostChaos: snapshot.entryCost.chaos,
       expectedReturn: snapshot.expectedReturn.divine,
+      expectedReturnChaos: snapshot.expectedReturn.chaos,
       expectedProfit: snapshot.expectedProfit.divine,
+      expectedProfitChaos: snapshot.expectedProfit.chaos,
       roiPercent: snapshot.roiPercent,
     }));
+
+export const getProfitHistoryChartTooltipCurrency = (
+  point: IProfitHistoryChartPoint,
+  dataKey: string,
+): { chaosValue?: number; divineValue?: number } => {
+  if (
+    dataKey !== 'entryCost' &&
+    dataKey !== 'expectedReturn' &&
+    dataKey !== 'expectedProfit'
+  ) {
+    return {};
+  }
+
+  const divineValue = point[dataKey];
+  const chaosKey = chaosValueByCurrencyKey[dataKey];
+  const chaosValue =
+    Math.abs(divineValue) > 1 ? undefined : Number(point[chaosKey]);
+
+  return {
+    chaosValue,
+    divineValue,
+  };
+};
 
 export const getProfitHistoryChartDomain = (
   chartData: IProfitHistoryChartPoint[],

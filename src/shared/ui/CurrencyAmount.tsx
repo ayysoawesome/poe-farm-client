@@ -24,6 +24,11 @@ const formatChaos = (value: number, language: string) => {
   return Math.round(value).toLocaleString(language);
 };
 
+export const shouldUseChaosCurrencyValue = (
+  resolvedDivineValue: number,
+  canUseChaos: boolean,
+) => canUseChaos && Math.abs(resolvedDivineValue) <= 1;
+
 export const CurrencyAmount: FC<ICurrencyAmountProps> = ({
   chaosValue,
   divineValue,
@@ -54,8 +59,11 @@ export const CurrencyAmount: FC<ICurrencyAmountProps> = ({
   }
 
   const canUseChaos = chaosValue !== null && chaosValue !== undefined;
-  const shouldUseChaos = canUseChaos && Math.abs(resolvedDivineValue) < 1;
-  const displayValue = shouldUseChaos ? chaosValue : resolvedDivineValue;
+  const shouldUseChaos = shouldUseChaosCurrencyValue(
+    resolvedDivineValue,
+    canUseChaos,
+  );
+  const displayValue = shouldUseChaos ? Number(chaosValue) : resolvedDivineValue;
   const sign = signed && displayValue > 0 ? '+' : '';
 
   return (

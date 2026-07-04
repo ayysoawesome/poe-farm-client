@@ -6,6 +6,10 @@ export const en = {
     backToBosses: 'Back to bosses',
     cost: 'Cost',
     drops: 'Drops',
+    dropsTable: {
+      chanceShort: 'Chance',
+      quantityShort: 'Qty',
+    },
     entry: 'Entry',
     errors: {
       details: 'Failed to load boss details.',

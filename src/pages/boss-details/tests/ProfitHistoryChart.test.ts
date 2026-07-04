@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { TProfitResponse } from '@/entities/boss';
 import {
   buildProfitHistoryChartData,
+  getProfitHistoryChartTooltipCurrency,
   getProfitHistoryChartDomain,
 } from '../model/ProfitHistoryChart.model';
 
@@ -38,8 +39,11 @@ describe('buildProfitHistoryChartData', () => {
         timestamp: 1000,
         label: expect.any(String),
         entryCost: 2,
+        entryCostChaos: 200,
         expectedReturn: 5,
+        expectedReturnChaos: 500,
         expectedProfit: 3,
+        expectedProfitChaos: 300,
         roiPercent: 25,
       }),
       expect.objectContaining({
@@ -47,8 +51,11 @@ describe('buildProfitHistoryChartData', () => {
         timestamp: 3000,
         label: expect.any(String),
         entryCost: 4,
+        entryCostChaos: 400,
         expectedReturn: 7,
+        expectedReturnChaos: 700,
         expectedProfit: 3,
+        expectedProfitChaos: 300,
         roiPercent: 25,
       }),
     ]);
@@ -62,6 +69,31 @@ describe('buildProfitHistoryChartData', () => {
     );
 
     expect(point.label).toContain('янв.');
+  });
+});
+
+describe('getProfitHistoryChartTooltipCurrency', () => {
+  it('keeps chaos values available until the divine value exceeds one', () => {
+    const [oneDivinePoint, aboveOneDivinePoint] = buildProfitHistoryChartData([
+      createSnapshot('one-divine', 1000, 1, 1, 1),
+      createSnapshot('above-one-divine', 2000, 1.01, 1.01, 1.01),
+    ]);
+
+    expect(
+      getProfitHistoryChartTooltipCurrency(oneDivinePoint, 'entryCost'),
+    ).toEqual({
+      chaosValue: 100,
+      divineValue: 1,
+    });
+    expect(
+      getProfitHistoryChartTooltipCurrency(
+        aboveOneDivinePoint,
+        'entryCost',
+      ),
+    ).toEqual({
+      chaosValue: undefined,
+      divineValue: 1.01,
+    });
   });
 });
 
