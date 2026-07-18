@@ -1,5 +1,6 @@
 export const en = {
   app: {
+    navigationLabel: 'Economy sections',
     subtitle: 'Boss profitability',
   },
   bossDetail: {
@@ -38,7 +39,6 @@ export const en = {
     errors: {
       list: 'Failed to load bosses.',
     },
-    navigationLabel: 'Economy sections',
     title: 'Bosses',
     table: {
       bossName: 'Boss name',
@@ -80,5 +80,67 @@ export const en = {
       second_other: '{{count}} seconds ago',
     },
     updated: 'Updated',
+  },
+  scarabs: {
+    title: 'Scarab Optimizer',
+    description:
+      'Inspect scarab groups, market values, drop weights, and ranked Atlas blocking setups.',
+    empty: {
+      grouped: 'No scarab groups were returned for this league.',
+      combinations: 'No blocking combinations were returned for these filters.',
+    },
+    errors: {
+      grouped: 'Failed to load scarab data.',
+      combinations: 'Failed to load blocking combinations.',
+    },
+    subroutes: {
+      label: 'Scarab optimizer views',
+      groups: 'Scarab groups',
+      blocking: 'Blocking optimizer',
+    },
+    pagination: {
+      summary: 'Page {{page}} of {{pages}} · {{total}} combinations',
+      previous: 'Previous page',
+      next: 'Next page',
+    },
+    freshness: {
+      title: 'Price data may be incomplete',
+      description:
+        '{{missing}} scarab prices are missing and {{stale}} prices are stale. Missing prices are not treated as zero.',
+    },
+    group: {
+      blockable: 'Blockable',
+      notBlockable: 'Not blockable',
+      summary:
+        '{{scarabs}} scarabs, {{enabled}} enabled, {{priced}} priced',
+      totalWeight: 'Total weight',
+      avgPrice: 'Avg price',
+      expectedValue: 'Weighted EV',
+    },
+    table: {
+      weight: 'Weight',
+      weightedValue: 'Weighted value',
+      included: 'Included',
+      missingPrice: 'Missing price',
+      yes: 'Yes',
+      no: 'No',
+    },
+    combinations: {
+      navTitle: 'Scarab Blocking',
+      title: 'Blocking Combinations',
+      description:
+        'Ranked server-calculated blocking setups compared with no scarab blocking.',
+      rank: 'Rank',
+      blockedGroups: 'Blocked groups',
+      expectedValue: 'Expected value',
+      baseline: 'No blocking',
+      baselineValue: 'Baseline',
+      delta: 'Delta',
+      deltaPercent: 'Delta %',
+      removedWeight: 'Removed weight',
+      remainingWeight: 'Remaining weight',
+      removedScarabs: 'Removed',
+      remainingScarabs: 'Remaining',
+    },
   },
 } as const;

@@ -1,5 +1,6 @@
 export const ru = {
   app: {
+    navigationLabel: 'Р Р°Р·РґРµР»С‹ СЌРєРѕРЅРѕРјРёРєРё',
     subtitle: 'Доходность боссов',
   },
   bossDetail: {
@@ -88,5 +89,67 @@ export const ru = {
       second_other: '{{count}} сек. назад',
     },
     updated: 'Обновлено',
+  },
+  scarabs: {
+    title: 'Scarab Optimizer',
+    description:
+      'Inspect scarab groups, market values, drop weights, and ranked Atlas blocking setups.',
+    empty: {
+      grouped: 'No scarab groups were returned for this league.',
+      combinations: 'No blocking combinations were returned for these filters.',
+    },
+    errors: {
+      grouped: 'Failed to load scarab data.',
+      combinations: 'Failed to load blocking combinations.',
+    },
+    subroutes: {
+      label: '\u042d\u043a\u0440\u0430\u043d\u044b scarab optimizer',
+      groups: '\u0413\u0440\u0443\u043f\u043f\u044b scarab',
+      blocking: '\u0411\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u043a\u0438',
+    },
+    pagination: {
+      summary:
+        '\u0421\u0442\u0440. {{page}} \u0438\u0437 {{pages}} · {{total}} \u043a\u043e\u043c\u0431\u0438\u043d\u0430\u0446\u0438\u0439',
+      previous: '\u041f\u0440\u0435\u0434. \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0430',
+      next: '\u0421\u043b\u0435\u0434. \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0430',
+    },
+    freshness: {
+      title: 'Price data may be incomplete',
+      description:
+        '{{missing}} scarab prices are missing and {{stale}} prices are stale. Missing prices are not treated as zero.',
+    },
+    group: {
+      blockable: 'Blockable',
+      notBlockable: 'Not blockable',
+      summary: '{{scarabs}} scarabs, {{enabled}} enabled, {{priced}} priced',
+      totalWeight: 'Total weight',
+      avgPrice: 'Avg price',
+      expectedValue: 'Weighted EV',
+    },
+    table: {
+      weight: 'Weight',
+      weightedValue: 'Weighted value',
+      included: 'Included',
+      missingPrice: 'Missing price',
+      yes: 'Yes',
+      no: 'No',
+    },
+    combinations: {
+      navTitle: 'Scarab Blocking',
+      title: 'Blocking Combinations',
+      description:
+        'Ranked server-calculated blocking setups compared with no scarab blocking.',
+      rank: 'Rank',
+      blockedGroups: 'Blocked groups',
+      expectedValue: 'Expected value',
+      baseline: 'No blocking',
+      baselineValue: 'Baseline',
+      delta: 'Delta',
+      deltaPercent: 'Delta %',
+      removedWeight: 'Removed weight',
+      remainingWeight: 'Remaining weight',
+      removedScarabs: 'Removed',
+      remainingScarabs: 'Remaining',
+    },
   },
 } as const;

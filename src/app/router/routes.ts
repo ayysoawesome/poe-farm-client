@@ -1,9 +1,15 @@
 import { createRoute } from '@tanstack/react-router';
 import { rootRoute } from './rootRoute';
 
+import { EconomyLayout } from '@/app/layouts/EconomyLayout';
 import { BossDetailPage } from '@/pages/boss-details';
 import { BossesPage } from '@/pages/bosses';
 import { HomePage } from '@/pages/home';
+import {
+  ScarabBlockingPage,
+  ScarabsLayout,
+  ScarabsPage,
+} from '@/pages/scarabs';
 
 export const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -23,14 +29,38 @@ export const legacyBossDetailRoute = createRoute({
   component: BossDetailPage,
 });
 
-export const bossesRoute = createRoute({
+export const economyRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/$leagueId/bosses',
+  path: '/$leagueId',
+  component: EconomyLayout,
+});
+
+export const bossesRoute = createRoute({
+  getParentRoute: () => economyRoute,
+  path: 'bosses',
   component: BossesPage,
 });
 
+export const scarabsRoute = createRoute({
+  getParentRoute: () => economyRoute,
+  path: 'scarabs',
+  component: ScarabsLayout,
+});
+
+export const scarabsIndexRoute = createRoute({
+  getParentRoute: () => scarabsRoute,
+  path: '/',
+  component: ScarabsPage,
+});
+
+export const scarabBlockingRoute = createRoute({
+  getParentRoute: () => scarabsRoute,
+  path: 'blocking',
+  component: ScarabBlockingPage,
+});
+
 export const bossDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/$leagueId/bosses/$bossId',
+  getParentRoute: () => economyRoute,
+  path: 'bosses/$bossId',
   component: BossDetailPage,
 });

@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { shouldUseChaosCurrencyValue } from './CurrencyAmount';
+import {
+  formatChaosCurrencyValue,
+  shouldUseChaosCurrencyValue,
+} from '../CurrencyAmount.model';
+
+describe('formatChaosCurrencyValue', () => {
+  it('rounds chaos values to tenths', () => {
+    expect(formatChaosCurrencyValue(12.34, 'en')).toBe('12.3');
+    expect(formatChaosCurrencyValue(12.36, 'en')).toBe('12.4');
+  });
+});
 
 describe('shouldUseChaosCurrencyValue', () => {
   it('uses chaos values unless the divine value exceeds one', () => {

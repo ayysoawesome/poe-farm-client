@@ -39,10 +39,7 @@ const formatPercent = (value: number | null, unknownText: string) => {
   return `${(value * 100).toFixed(value < 0.01 ? 2 : 1)}%`;
 };
 
-const getGroupQuantity = (
-  group: TDropGroup,
-  selectedVariantId: TVariantId,
-) => {
+const getGroupQuantity = (group: TDropGroup, selectedVariantId: TVariantId) => {
   if (group.selectedQuantity !== undefined) return group.selectedQuantity;
   if (selectedVariantId === 'default') return 1;
 
@@ -84,7 +81,7 @@ const getDropRows = (
   return [...dropRows, ...groupRows];
 };
 
-export const getBossDropsTableColumns = (
+const getBossDropsTableColumns = (
   showQuantity: boolean,
 ): TDropTableColumn[] => [
   {

@@ -3,15 +3,22 @@ import { rootRoute } from './rootRoute';
 import {
   bossDetailRoute,
   bossesRoute,
+  economyRoute,
   indexRoute,
   legacyBossDetailRoute,
   legacyBossesRoute,
+  scarabBlockingRoute,
+  scarabsIndexRoute,
+  scarabsRoute,
 } from './routes';
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
-  bossDetailRoute,
-  bossesRoute,
+  economyRoute.addChildren([
+    bossDetailRoute,
+    bossesRoute,
+    scarabsRoute.addChildren([scarabsIndexRoute, scarabBlockingRoute]),
+  ]),
   legacyBossDetailRoute,
   legacyBossesRoute,
 ]);

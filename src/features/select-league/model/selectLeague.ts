@@ -1,5 +1,7 @@
 import type { TLeague } from '@/entities/league';
 
+const LEAGUE_SCOPED_SECTIONS = new Set(['bosses', 'scarabs']);
+
 export const getDefaultLeague = (leagues: TLeague[]): TLeague | undefined =>
   leagues.find((league) => league.isActive) ?? leagues[0];
 
@@ -18,7 +20,11 @@ export const reconcileSelectedLeague = (
 export const getLeagueIdFromPathname = (pathname: string): string | null => {
   const [, firstSegment, secondSegment] = pathname.split('/');
 
-  if (!firstSegment || firstSegment === 'bosses' || secondSegment !== 'bosses') {
+  if (
+    !firstSegment ||
+    LEAGUE_SCOPED_SECTIONS.has(firstSegment) ||
+    !LEAGUE_SCOPED_SECTIONS.has(secondSegment)
+  ) {
     return null;
   }
 
@@ -32,11 +38,11 @@ export const buildLeaguePath = (
   const encodedLeagueId = encodeURIComponent(leagueId);
   const segments = pathname.split('/').filter(Boolean);
 
-  if (segments[0] === 'bosses') {
+  if (LEAGUE_SCOPED_SECTIONS.has(segments[0] ?? '')) {
     return `/${[encodedLeagueId, ...segments].join('/')}`;
   }
 
-  if (segments[1] === 'bosses') {
+  if (LEAGUE_SCOPED_SECTIONS.has(segments[1] ?? '')) {
     return `/${[encodedLeagueId, ...segments.slice(1)].join('/')}`;
   }
 

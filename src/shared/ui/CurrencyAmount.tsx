@@ -2,6 +2,10 @@ import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CHAOS_ORB_ICON_URL, DIVINE_ORB_ICON_URL } from '@/shared/assets';
 import { cn } from '@/shared/lib';
+import {
+  formatChaosCurrencyValue,
+  shouldUseChaosCurrencyValue,
+} from './CurrencyAmount.model';
 
 interface ICurrencyAmountProps {
   chaosValue?: number | null;
@@ -19,15 +23,6 @@ const formatNumber = (value: number, language: string) => {
 
   return rounded.toLocaleString(language);
 };
-
-const formatChaos = (value: number, language: string) => {
-  return Math.round(value).toLocaleString(language);
-};
-
-export const shouldUseChaosCurrencyValue = (
-  resolvedDivineValue: number,
-  canUseChaos: boolean,
-) => canUseChaos && Math.abs(resolvedDivineValue) <= 1;
 
 export const CurrencyAmount: FC<ICurrencyAmountProps> = ({
   chaosValue,
@@ -63,14 +58,16 @@ export const CurrencyAmount: FC<ICurrencyAmountProps> = ({
     resolvedDivineValue,
     canUseChaos,
   );
-  const displayValue = shouldUseChaos ? Number(chaosValue) : resolvedDivineValue;
+  const displayValue = shouldUseChaos
+    ? Number(chaosValue)
+    : resolvedDivineValue;
   const sign = signed && displayValue > 0 ? '+' : '';
 
   return (
     <span className={cn('inline-flex items-center gap-1.5', className)}>
       {sign}
       {shouldUseChaos
-        ? formatChaos(displayValue, language)
+        ? formatChaosCurrencyValue(displayValue, language)
         : formatNumber(displayValue, language)}
       <img
         alt=''

@@ -44,6 +44,13 @@ describe('select league model', () => {
     expect(getLeagueIdFromPathname('/hardcore/bosses/maven')).toBe('hardcore');
   });
 
+  it('reads the league id from league-scoped scarab routes', () => {
+    expect(getLeagueIdFromPathname('/mercenaries/scarabs')).toBe('mercenaries');
+    expect(getLeagueIdFromPathname('/mercenaries/scarabs/blocking')).toBe(
+      'mercenaries',
+    );
+  });
+
   it('does not treat legacy bosses routes as league-scoped', () => {
     expect(getLeagueIdFromPathname('/bosses')).toBeNull();
     expect(getLeagueIdFromPathname('/bosses/maven')).toBeNull();
@@ -52,6 +59,15 @@ describe('select league model', () => {
   it('replaces the league segment while keeping the current bosses path', () => {
     expect(buildLeaguePath('/mercenaries/bosses/maven', 'hardcore')).toBe(
       '/hardcore/bosses/maven',
+    );
+  });
+
+  it('replaces the league segment while keeping the current scarabs path', () => {
+    expect(buildLeaguePath('/mercenaries/scarabs', 'hardcore')).toBe(
+      '/hardcore/scarabs',
+    );
+    expect(buildLeaguePath('/mercenaries/scarabs/blocking', 'hardcore')).toBe(
+      '/hardcore/scarabs/blocking',
     );
   });
 

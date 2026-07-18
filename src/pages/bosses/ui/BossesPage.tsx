@@ -1,25 +1,12 @@
-import type { FC, ReactNode } from 'react';
+import type { FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { BossesNavigation } from './BossesNavigation';
 import { BossesTable } from './BossesTabe';
 import { queryKeys } from '@/shared/api';
 import { bossService } from '@/entities/boss';
 import { UISkeleton } from '@/shared/ui';
 import { getLeagueIdFromPathname } from '@/features/select-league/model/selectLeague';
-
-const BossesPageLayout: FC<{
-  children: ReactNode;
-  leagueId: string | null;
-}> = ({ children, leagueId }) => {
-  return (
-    <div className='grid gap-4 lg:grid-cols-[14rem_minmax(0,1fr)]'>
-      <BossesNavigation leagueId={leagueId} />
-      <div className='min-w-0'>{children}</div>
-    </div>
-  );
-};
 
 export const BossesPage: FC = () => {
   const location = useLocation();
@@ -34,25 +21,17 @@ export const BossesPage: FC = () => {
 
   if (!leagueId || isLoading) {
     return (
-      <BossesPageLayout leagueId={leagueId}>
-        <UISkeleton className='block h-[28rem] w-full rounded-md border border-border bg-surface shadow-panel' />
-      </BossesPageLayout>
+      <UISkeleton className='block h-[28rem] w-full rounded-md border border-border bg-surface shadow-panel' />
     );
   }
 
   if (isError) {
     return (
-      <BossesPageLayout leagueId={leagueId}>
-        <div className='rounded-md border border-border bg-surface px-5 py-4 text-lg text-loss'>
-          {t('bosses.errors.list')}
-        </div>
-      </BossesPageLayout>
+      <div className='rounded-md border border-border bg-surface px-5 py-4 text-lg text-loss'>
+        {t('bosses.errors.list')}
+      </div>
     );
   }
 
-  return (
-    <BossesPageLayout leagueId={leagueId}>
-      <BossesTable data={data ?? []} leagueId={leagueId} />
-    </BossesPageLayout>
-  );
+  return <BossesTable data={data ?? []} leagueId={leagueId} />;
 };
