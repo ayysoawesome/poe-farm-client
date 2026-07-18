@@ -8,7 +8,7 @@ import type {
   scarabGroupSummarySchema,
   scarabGroupsResponseSchema,
   scarabItemSchema,
-} from '../../../entities/scarab/model/scarab.schemas';
+} from './scarab.schemas';
 
 export type TScarabGroup = z.infer<typeof scarabGroupSchema>;
 export type TScarabItem = z.infer<typeof scarabItemSchema>;

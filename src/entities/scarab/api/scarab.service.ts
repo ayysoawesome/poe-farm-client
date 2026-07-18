@@ -11,7 +11,7 @@ import type {
   TScarabBlockingCombinationsResponse,
   TScarabBlockingResult,
   TScarabGroupsResponse,
-} from '../../../pages/bosses/ui/scarab.types';
+} from '../model/scarab.types';
 
 const ENDPOINT = '/scarabs';
 

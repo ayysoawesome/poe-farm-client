@@ -9,4 +9,4 @@ export type {
   TScarabGroupsResponse,
   TScarabGroupSummary,
   TScarabItem,
-} from '../../pages/bosses/ui/scarab.types';
+} from './model/scarab.types';
