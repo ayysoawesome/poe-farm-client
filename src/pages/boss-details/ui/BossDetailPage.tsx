@@ -47,29 +47,26 @@ export const BossDetailPage: FC = () => {
   const { t } = useTranslation();
   const { bossId } = useParams({ strict: false });
   const leagueId = getLeagueIdFromPathname(location.pathname);
-  const [requestedVariantId, setRequestedVariantId] = useState<TVariantId | null>(
-    getVariantIdFromSearch,
-  );
+  const [requestedVariantId, setRequestedVariantId] =
+    useState<TVariantId | null>(getVariantIdFromSearch);
   const detailQuery = useQuery({
     queryKey: queryKeys.bosses.detail(
       bossId ?? '',
       leagueId ?? '',
       requestedVariantId,
     ),
-    queryFn: () => bossService.getBossById(bossId!, leagueId!, requestedVariantId),
+    queryFn: () =>
+      bossService.getBossById(bossId!, leagueId!, requestedVariantId),
     enabled: Boolean(leagueId && bossId),
   });
-  const variantOptions = useMemo(
-    () => {
-      const variants = detailQuery.data?.variants ?? [];
+  const variantOptions = useMemo(() => {
+    const variants = detailQuery.data?.variants ?? [];
 
-      return variants.map((variant) => ({
-        value: variant.id,
-        label: variant.label,
-      }));
-    },
-    [detailQuery.data?.variants],
-  );
+    return variants.map((variant) => ({
+      value: variant.id,
+      label: variant.label,
+    }));
+  }, [detailQuery.data?.variants]);
 
   if (!leagueId || !bossId || detailQuery.isLoading) {
     return (
@@ -107,7 +104,7 @@ export const BossDetailPage: FC = () => {
 
   if (detailQuery.isError || !detailQuery.data) {
     return (
-      <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden px-4 py-8 sm:px-6 lg:px-8'>
+      <section className='mx-auto box-border max-w-page overflow-x-hidden px-4 py-8 sm:px-6 lg:px-8'>
         {leagueId ? (
           <Link
             aria-label={t('bossDetail.backToBosses')}
@@ -145,7 +142,7 @@ export const BossDetailPage: FC = () => {
   };
 
   return (
-    <section className='mx-auto box-border w-[100dvw] max-w-page overflow-x-hidden text-text'>
+    <section className='mx-auto box-border max-w-page overflow-x-hidden text-text'>
       <div className='grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]'>
         <div className='rounded-md border border-border bg-surface p-5 shadow-panel backdrop-blur-md flex gap-5'>
           {leagueId ? (
